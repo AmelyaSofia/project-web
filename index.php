@@ -187,7 +187,7 @@
 <section class="hero">
   <div class="hero-content">
     <h2>Transform Your Look with Royal Beauty</h2>
-    <p>Layanan salon premium untuk kamu yang ingin tampil menawan setiap saat ada habib</p>
+    <p>Layanan salon premium untuk kamu yang ingin tampil menawan setiap saat ada sopia</p>
   </div>
 </section>
 
