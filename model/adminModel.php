@@ -71,6 +71,5 @@ class ModelAdmin {
     public function getAllAdmins() {
         return $this->getAdmins();
     }
-    
 }
 ?>
