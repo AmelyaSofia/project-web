@@ -51,7 +51,6 @@
       gap: 15px;
       align-items: center;
     }
-
     .user-nav a {
       text-decoration: none;
       color: #5c4033;

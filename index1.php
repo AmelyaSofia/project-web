@@ -111,7 +111,6 @@
             <img src="image\yoona.jpg" alt="Admin Profile" class="profile-img">
           </div>
         </div>
-
         <!-- Charts & Stats -->
         <div class="row mb-4">
           <!-- Activity Chart diperbesar menjadi 9 kolom -->
