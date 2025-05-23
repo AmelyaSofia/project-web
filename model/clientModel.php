@@ -28,9 +28,9 @@ class ModelClient {
 
     public function addCLient($nama_client, $email_client, $notelp_client, $alamat_client, $tanggal_daftar) {
         global $conn;
-        $sql = "INSERT INTO client (nama_client, email_client, notelp_client, alamat_client, tanggal_daftar) VALUES (?, ?, ?)";
+        $sql = "INSERT INTO client (nama_client, email_client, notelp_client, alamat_client, tanggal_daftar) VALUES (?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("sss", $nama_client, $email_client, $notelp_client, $alamat_client, $tanggal_daftar);
+        $stmt->bind_param("sssss", $nama_client, $email_client, $notelp_client, $alamat_client, $tanggal_daftar);
         return $stmt->execute();
     }
 
@@ -38,7 +38,7 @@ class ModelClient {
         global $conn;
         $sql = "UPDATE client SET nama_client = ?, email_client = ?, notelp_client = ?, alamat_client = ?, tanggal_daftar = ? WHERE id = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("sssi", $nama_client, $email_client, $notelp_client, $alamat_client, $tanggal_daftar, $id_client);
+        $stmt->bind_param("sssssi", $nama_client, $email_client, $notelp_client, $alamat_client, $tanggal_daftar, $id_client);
         return $stmt->execute();
     }
 
