@@ -38,10 +38,11 @@ class ControllerAdmin {
     public function addAdmin() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $nama_admin = $_POST['nama_admin'];
-            $email = $_POST['email'];
-            $password = $_POST['password'];
+            $email_admin = $_POST['email_admin'];
+            $password_admin = $_POST['password_admin'];
+            $foto_admin = $_POST['foto_admin'];
 
-            $berhasil = $this->model->addAdmin($nama_admin, $email, $password);
+            $berhasil = $this->model->addAdmin($nama_admin, $email_admin, $password_admin, $foto_admin);
             if ($berhasil) {
                 header("Location: index.php?fitur=list&message=Admin berhasil ditambahkan");
             } else {
@@ -56,10 +57,11 @@ class ControllerAdmin {
     public function updateAdmin($id_admin) {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $nama_admin = $_POST['nama_admin'];
-            $email = $_POST['email'];
-            $password = $_POST['password'];
+            $email_admin = $_POST['email_admin'];
+            $password_admin = $_POST['password_admin'];
+            $foto_admin = $_POST['foto_admin'];
 
-            $terupdate = $this->model->updateAdmin($id_admin, $nama_admin, $email, $password);
+            $terupdate = $this->model->updateAdmin($id_admin, $nama_admin, $email_admin, $password_admin, $foto_admin);
             if ($terupdate) {
                 header("Location: index.php?fitur=list&message=Admin berhasil diupdate");
             } else {
