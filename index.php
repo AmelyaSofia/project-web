@@ -1,13 +1,17 @@
 <?php
+$modul = $_GET['modul'] ?? 'admin';
+$fitur = $_GET['fitur'] ?? 'list';
 
 switch ($modul) {
+    // case 'client':
+    //     include './controller/clientController.php';
+    //     $controller = new ControllerClient();
+    //     $controller->handleRequest($fitur);
+    //     break;
+
     case 'admin':
-        $adminController = new ControllerAdmin();
-        $adminController->handleRequest($id_admin);
-        break;
-    case 'client':
-        $clientController = new ControllerClient();
-        $clientController->handleRequest($id_client);
+        include './controller/adminController.php';
+        $controller = new ControllerAdmin();
+        $controller->handleRequest($fitur);
         break;
 }
-?>

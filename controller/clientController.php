@@ -30,7 +30,7 @@ class ControllerClient {
                 }
                 break;
             default:
-                $this->listclients();
+                $this->listClients();
                 break;
         }
     }
@@ -38,7 +38,7 @@ class ControllerClient {
     public function addClient() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $nama_client = $_POST['nama_client'];
-            $email_client = $_POST['email_admin'];
+            $email_client = $_POST['email_client'];
             $notelp_client = $_POST['notelp_client'];
             $alamat_client = $_POST['alamat_client'];
             $tanggal_daftar = $_POST['tanggal_daftar'];
@@ -58,12 +58,12 @@ class ControllerClient {
     public function updateClient($id_client) {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $nama_client = $_POST['nama_client'];
-            $email_client = $_POST['email_admin'];
+            $email_client = $_POST['email_client'];
             $notelp_client = $_POST['notelp_client'];
             $alamat_client = $_POST['alamat_client'];
             $tanggal_daftar = $_POST['tanggal_daftar'];
 
-            $terupdate = $this->model->updateCLient($id_client, $nama_client, $email_client, $notelp_client, $alamat_client, $tanggal_daftar);
+            $terupdate = $this->model->updateClient($id_client, $nama_client, $email_client, $notelp_client, $alamat_client, $tanggal_daftar);
             if ($terupdate) {
                 header("Location: index.php?fitur=list&message=Client berhasil diupdate");
             } else {
@@ -71,12 +71,12 @@ class ControllerClient {
             }
             exit;
         } else {
-            $admin = $this->model->getCLientById($id_client);
-            if (!$admin) {
+            $client = $this->model->getClientById($id_client);
+            if (!$client) {
                 header("Location: index.php?fitur=list&message=Client tidak ditemukan");
                 exit;
             }
-            include './view/client/updateAdmin.php';
+            include './view/client/updateClient.php';
         }
     }
 
@@ -90,14 +90,14 @@ class ControllerClient {
         exit;
     }
 
-    public function listclients() {
+    public function listClients() {
         $keyword = $_GET['search'] ?? null;
         if ($keyword) {
-            $admins = $this->model->searchClient    ($keyword);
+            $clients = $this->model->searchClient($keyword);
         } else {
-            $admins = $this->model->getClients();
+            $clients = $this->model->getClients();
         }
-        include './view/client/listAdmin.php';
+        include './view/client/clientList.php';
     }
 }
 ?>

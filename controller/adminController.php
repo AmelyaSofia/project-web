@@ -88,14 +88,14 @@ class ControllerAdmin {
         exit;
     }
 
-    public function listadmins() {
+    public function listAdmins() {
         $keyword = $_GET['search'] ?? null;
         if ($keyword) {
             $admins = $this->model->searchAdmin($keyword);
         } else {
             $admins = $this->model->getAdmins();
         }
-        include './view/admin/listAdmin.php';
+        include './view/admin/adminList.php';
     }
 }
 ?>
