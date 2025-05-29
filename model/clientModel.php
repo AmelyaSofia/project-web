@@ -18,7 +18,7 @@ class ModelClient {
 
     public function getCLientById($id_client) {
         global $conn;
-        $sql = "SELECT * FROM client WHERE id = ?";
+        $sql = "SELECT * FROM client WHERE id_client = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $id_client);
         $stmt->execute();
@@ -36,7 +36,7 @@ class ModelClient {
 
     public function updateCLient($id_client, $nama_client, $email_client, $notelp_client, $alamat_client, $tanggal_daftar) {
         global $conn;
-        $sql = "UPDATE client SET nama_client = ?, email_client = ?, notelp_client = ?, alamat_client = ?, tanggal_daftar = ? WHERE id = ?";
+        $sql = "UPDATE client SET nama_client = ?, email_client = ?, notelp_client = ?, alamat_client = ?, tanggal_daftar = ? WHERE id_client = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("sssssi", $nama_client, $email_client, $notelp_client, $alamat_client, $tanggal_daftar, $id_client);
         return $stmt->execute();
@@ -44,7 +44,7 @@ class ModelClient {
 
     public function deleteClient($id_client) {
         global $conn;
-        $sql = "DELETE FROM client WHERE id = ?";
+        $sql = "DELETE FROM client WHERE id_client = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $id_client);
         return $stmt->execute();

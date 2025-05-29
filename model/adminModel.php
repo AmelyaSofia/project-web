@@ -18,7 +18,7 @@ class ModelAdmin {
 
     public function getAdminById($id_admin) {
         global $conn;
-        $sql = "SELECT * FROM admin WHERE id = ?";
+        $sql = "SELECT * FROM admin WHERE id_admin = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $id_admin);
         $stmt->execute();
@@ -28,23 +28,23 @@ class ModelAdmin {
 
     public function addAdmin($nama_admin, $email_admin, $password_admin, $foto_admin) {
         global $conn;
-        $sql = "INSERT INTO admin (nama_admin, email_admin, password_admin, foto_admin) VALUES (?, ?, ?)";
+        $sql = "INSERT INTO admin (nama_admin, email_admin, password_admin, foto_admin) VALUES (?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("sss", $nama_admin, $email_admin, $password_admin, $foto_admin);
+        $stmt->bind_param("ssss", $nama_admin, $email_admin, $password_admin, $foto_admin);
         return $stmt->execute();
     }
 
     public function updateAdmin($id_admin, $nama_admin, $email_admin, $password_admin, $foto_admin) {
         global $conn;
-        $sql = "UPDATE admin SET nama_admin = ?, email_admin = ?, password_admin = ?, foto_admin = ? WHERE id = ?";
+        $sql = "UPDATE admin SET nama_admin = ?, email_admin = ?, password_admin = ?, foto_admin = ? WHERE id_admin = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("sssi", $nama_admin, $email_admin, $password_admin, $foto_admin, $id_admin);
+        $stmt->bind_param("ssssi", $nama_admin, $email_admin, $password_admin, $foto_admin, $id_admin);
         return $stmt->execute();
     }
 
     public function deleteAdmin($id_admin) {
         global $conn;
-        $sql = "DELETE FROM admin WHERE id = ?";
+        $sql = "DELETE FROM admin WHERE id_admin = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $id_admin);
         return $stmt->execute();

@@ -50,7 +50,7 @@ class ControllerAdmin {
             }
             exit;
         } else {
-            include './view/admin/addAdmin.php';
+            include './view/admin/adminAdd.php';
         }
     }
 
@@ -74,7 +74,7 @@ class ControllerAdmin {
                 header("Location: index.php?fitur=list&message=Admin tidak ditemukan");
                 exit;
             }
-            include './view/admin/updateAdmin.php';
+            include './view/admin/adminUpdate.php';
         }
     }
 

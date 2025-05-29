@@ -51,7 +51,7 @@ class ControllerClient {
             }
             exit;
         } else {
-            include './view/client/addClient.php';
+            include './view/client/clientAdd.php';
         }
     }
 
@@ -76,7 +76,7 @@ class ControllerClient {
                 header("Location: index.php?fitur=list&message=Client tidak ditemukan");
                 exit;
             }
-            include './view/client/updateClient.php';
+            include './view/client/clientUpdate.php';
         }
     }
 
