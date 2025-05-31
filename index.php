@@ -1,7 +1,6 @@
 <?php
-$modul = $_GET['modul'] ?? 'layanan';
+$modul = $_GET['modul'] ?? 'karyawan';
 $fitur = $_GET['fitur'] ?? 'list';
-// $id_layanan = $_GET['id_layanan'] ?? null;
 
 switch ($modul) {
     // case 'client':
@@ -16,9 +15,16 @@ switch ($modul) {
     //     $controller->handleRequest($fitur);
     //     break;
 
-    case 'layanan':
-        include './controller/layananController.php';
-        $controller = new ControllerLayanan();
+    // case 'layanan':
+    //     include './controller/layananController.php';
+    //     $controller = new ControllerLayanan();
+    //     $controller->handleRequest($fitur);
+    //     break;
+
+    case 'karyawan':
+        include './controller/karyawanController.php';
+        $controller = new ControllerKaryawan();
         $controller->handleRequest($fitur);
         break;
+    
 }

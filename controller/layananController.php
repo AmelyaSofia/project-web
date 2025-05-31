@@ -68,11 +68,11 @@ class ControllerLayanan {
             exit;   
         } else {
             $layanan = $this->model->getLayananById($id_layanan);
-            if ($layanan) {
-                include './view/layanan/layananUpdate.php';
-            } else {
-                header("Location: index.php?fitur=layanan&message=Layanan tidak ditemukan");
+            if (!$layanan) {
+                header("Location: index.php?fitur=list&message=Layanan tidak ditemukan");
+                exit;
             }
+            include './view/layanan/layananUpdate.php';
         }
     }
     public function deleteLayanan($id_layanan) {
