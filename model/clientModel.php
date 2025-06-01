@@ -16,7 +16,7 @@ class ModelClient {
         return $clients;
     }
 
-    public function getCLientById($id_client) {
+    public function getClientById($id_client) {
         global $conn;
         $sql = "SELECT * FROM client WHERE id_client = ?";
         $stmt = $conn->prepare($sql);
@@ -26,7 +26,7 @@ class ModelClient {
         return $result->fetch_assoc();
     }
 
-    public function addCLient($nama_client, $email_client, $notelp_client, $alamat_client, $tanggal_daftar) {
+    public function addClient($nama_client, $email_client, $notelp_client, $alamat_client, $tanggal_daftar) {
         global $conn;
         $sql = "INSERT INTO client (nama_client, email_client, notelp_client, alamat_client, tanggal_daftar) VALUES (?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
@@ -34,7 +34,7 @@ class ModelClient {
         return $stmt->execute();
     }
 
-    public function updateCLient($id_client, $nama_client, $email_client, $notelp_client, $alamat_client, $tanggal_daftar) {
+    public function updateClient($id_client, $nama_client, $email_client, $notelp_client, $alamat_client, $tanggal_daftar) {
         global $conn;
         $sql = "UPDATE client SET nama_client = ?, email_client = ?, notelp_client = ?, alamat_client = ?, tanggal_daftar = ? WHERE id_client = ?";
         $stmt = $conn->prepare($sql);
@@ -70,6 +70,42 @@ class ModelClient {
 
     public function getAllClients() {
         return $this->getClients();
+    }
+
+    public function getClientBookings($id_client) {
+        global $conn;
+        $sql = "SELECT b.*, l.nama_layanan FROM booking b 
+                JOIN layanan l ON b.id_layanan = l.id_layanan
+                WHERE b.id_client = ?
+                ORDER BY b.tanggal DESC, b.jam DESC";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $id_client);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $bookings = [];
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $bookings[] = $row;
+            }
+        }
+        return $bookings;
+    }
+
+    public function addBooking($id_client, $id_layanan, $tanggal, $jam) {
+        global $conn;
+        $sql = "INSERT INTO booking (id_client, id_layanan, tanggal, jam, status) VALUES (?, ?, ?, ?, 'terjadwal')";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("iiss", $id_client, $id_layanan, $tanggal, $jam);
+        return $stmt->execute();
+    }
+
+    public function cancelBooking($id_booking, $id_client) {
+        global $conn;
+        // hanya client yang punya booking bisa batalkan
+        $sql = "UPDATE booking SET status = 'batal' WHERE id_booking = ? AND id_client = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ii", $id_booking, $id_client);
+        return $stmt->execute();
     }
 }
 ?>
