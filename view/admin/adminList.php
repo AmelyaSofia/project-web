@@ -111,6 +111,12 @@
       border-radius: 4px;
     }
 
+    .logo {
+      display: block;       
+      height: 100px;        
+      width: auto;          
+      margin: 20px auto;    /* margin atas bawah 20px, kiri kanan auto supaya tengah */
+    }
     .main {
       margin-left: 280px;
       flex-grow: 1;
@@ -512,7 +518,7 @@
 <body>
 
   <div class="sidebar" id="sidebar">
-    <h2><i class="fas fa-spa"></i>BeautyCare</h2>
+    <img src="../../image/logo.png" alt="Logo" class="logo">
     <ul>
       <li onclick="location.href='#'"><i class="fas fa-tachometer-alt"></i> Dashboard</li>
       <li class="active"><i class="fas fa-user-shield"></i> Admin</li>
