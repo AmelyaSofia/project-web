@@ -4,7 +4,7 @@ include './config/dbconnect.php';
 class ModelClient {
     public function getClients() {
         global $conn;
-        $sql = "SELECT * FROM client";
+        $sql = "SELECT * FROM client ORDER BY tanggal_daftar DESC";
         $result = mysqli_query($conn, $sql);
 
         $clients = [];
@@ -72,9 +72,9 @@ class ModelClient {
         return $this->getClients();
     }
 
-    public function getClientBookings($id_client) {
+   public function getClientBookings($id_client) {
         global $conn;
-        $sql = "SELECT b.*, l.nama_layanan FROM booking b 
+        $sql = "SELECT b.*, l.nama_layanan FROM booking b
                 JOIN layanan l ON b.id_layanan = l.id_layanan
                 WHERE b.id_client = ?
                 ORDER BY b.tanggal DESC, b.jam DESC";
@@ -101,7 +101,6 @@ class ModelClient {
 
     public function cancelBooking($id_booking, $id_client) {
         global $conn;
-        // hanya client yang punya booking bisa batalkan
         $sql = "UPDATE booking SET status = 'batal' WHERE id_booking = ? AND id_client = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ii", $id_booking, $id_client);
