@@ -1,11 +1,27 @@
 <?php
 session_start();
+include_once('config/dbconnect.php');
+global $conn;
 
-$stylists = [
-    1 => ['id' => 1, 'nama' => 'Anna', 'spesialisasi' => 'Hair Stylist'],
-    2 => ['id' => 2, 'nama' => 'Budi', 'spesialisasi' => 'Color Specialist'],
-    3 => ['id' => 3, 'nama' => 'Citra', 'spesialisasi' => 'Beauty Therapist']
-];
+$stylists = [];
+$result = $conn->query("SELECT id_karyawan, nama_karyawan, peran_karyawan FROM karyawan");
+while ($row = $result->fetch_assoc()) {
+    $stylists[$row['id_karyawan']] = [
+        'id' => $row['id_karyawan'],
+        'nama' => $row['nama_karyawan'],
+        'spesialisasi' => $row['peran_karyawan']
+    ];
+}
+
+$services = [];
+$resultService = $conn->query("SELECT id_layanan, nama_layanan, harga_layanan FROM layanan");
+while ($row = $resultService->fetch_assoc()) {
+    $services[$row['id_layanan']] = [
+        'id' => $row['id_layanan'],
+        'nama' => $row['nama_layanan'],
+        'harga' => $row['harga_layanan']
+    ];
+}
 
 $paymentMethods = [
     'transfer' => 'Transfer Bank',
@@ -13,7 +29,7 @@ $paymentMethods = [
     'cash' => 'Cash di Tempat'
 ];
 
-$step = $_GET['step'] ?? 'pilih_stylist';
+$step = $_GET['step'] ?? 'pilih_layanan';
 $selectedStylist = $_GET['stylist_id'] ?? null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -38,6 +54,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     elseif (isset($_POST['confirm'])) {
         $_SESSION['booking']['payment_method'] = $_POST['payment_method'];
         $_SESSION['booking']['catatan'] = $_POST['catatan'] ?? '';
+
+        $service_id = $_SESSION['booking']['service_id'];
+        $tanggal = $_SESSION['booking']['tanggal'];
+        $jam = $_SESSION['booking']['jam'];
+        $id_client = $_SESSION['id_client'] ?? 2; 
+
+        $status = 'menunggu';
+
+        $stmt = $conn->prepare("INSERT INTO booking (id_client, id_layanan, tanggal, jam, status) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("iisss", $id_client, $service_id, $tanggal, $jam, $status);
+        $stmt->execute();
+        $stmt->close();
+
         $step = 'selesai';
     }
 }
@@ -50,13 +79,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Booking Salon - Glamour Beauty</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="booking.css">
+    <link rel="stylesheet" href="view/client/booking.css">
 </head>
 <body>
    <header>
     <div class="container" style="display: flex; align-items: center; justify-content: center; gap: 5px;">
         <div style="width: 120px; height: 120px; background: white; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
-            <img src="../../image/logo.png" alt="Royal Beauty Logo" class="logo-image" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+            <img src="image/logo.png" alt="Royal Beauty Logo" class="logo-image" style="max-width: 100%; max-height: 100%; object-fit: contain;">
         </div>
         <div class="logo" style="font-size: 24px; font-weight: 600; color: #93552f;">Royal Beauty Salon</div>
     </div>
@@ -80,7 +109,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
             
-        <?php if ($step === 'pilih_stylist'): ?>
+        <?php if ($step === 'pilih_layanan'): ?>
+            <h2>Pilih Layanan</h2>
+            <p>Silakan pilih layanan yang Anda inginkan</p>
+            <form method="POST">
+                <div class="card-container">
+                    <?php foreach ($services as $service): ?>
+                        <label>
+                            <input type="radio" name="service_id" value="<?= $service['id'] ?>" style="display:none;" required>
+                            <div class="card">
+                                <div class="card-body">
+                                    <h3 class="card-title"><?= htmlspecialchars($service['nama']) ?></h3>
+                                    <div class="card-price">Rp <?= number_format($service['harga'], 0, ',', '.') ?></div>
+                                </div>
+                            </div>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+                <div class="action-buttons">
+                    <button type="submit" class="btn" style="font-family: 'Poppins', sans-serif; font-weight: 500;">
+                        Lanjutkan
+                    </button>
+                </div>
+            </form>
+        <?php elseif ($step === 'pilih_stylist'): ?>
             <h2>Pilih Stylist</h2>
             <p>Silakan pilih stylist yang Anda inginkan</p>
             

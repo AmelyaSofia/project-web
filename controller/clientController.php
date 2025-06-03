@@ -8,45 +8,25 @@ class ControllerClient {
         $this->model = new ModelClient();
     }
 
-    public function handleRequest($fitur, $id_client = null) {
-        $id_booking = $_GET['id_booking'] ?? null;
+    public function handleRequest($fitur) {
+        $id_client = $_GET['id_client'] ?? null;
 
         switch ($fitur) {
-            case 'booking_add':
-                if ($id_client) {
-                    $this->addBooking($id_client);
-                } else {
-                    header("Location: index.php?fitur=list");
-                }
-                break;
-            case 'booking_cancel':
-                if ($id_booking && $id_client) {
-                    $this->cancelBooking($id_booking, $id_client);
-                } else {
-                    header("Location: index.php?fitur=booking_list&id_client=$id_client");
-                }
-                break;
-            case 'booking_list':
-                if ($id_client) {
-                    $this->listBookings($id_client);
-                } else {
-                    header("Location: index.php?fitur=list");
-                }
-                break;
-            case 'list':
-                $this->listClients();
-                break;
-            case 'add':
+            case 'tambah':
                 $this->addClient();
                 break;
-            case 'edit':
+            case 'update':
                 if ($id_client) {
-                    $this->editClient($id_client);
+                    $this->updateClient($id_client);
+                } else {
+                    header("Location: index.php?fitur=client");
                 }
                 break;
-            case 'delete':
+            case 'hapus':
                 if ($id_client) {
-                    $this->deleteClient($id_client);
+                    $this->deleteClient((int)$id_client);
+                } else {
+                    header("Location: index.php?fitur=client");
                 }
                 break;
             default:
@@ -55,30 +35,18 @@ class ControllerClient {
         }
     }
 
-    public function listClients() {
-        $keyword = $_GET['search'] ?? null;
-        if ($keyword) {
-            $clients = $this->model->searchClient($keyword);
-        } else {
-            $clients = $this->model->getClients();
-        }
-        include './view/client/clientList.php';
-    }
-
     public function addClient() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $nama_client = $_POST['nama_client'];
             $email_client = $_POST['email_client'];
             $notelp_client = $_POST['notelp_client'];
             $alamat_client = $_POST['alamat_client'];
-            $tanggal_daftar = $_POST['tanggal_daftar'];
 
-            $berhasil = $this->model->addClient($nama_client, $email_client, $notelp_client, $alamat_client, $tanggal_daftar);
-
+            $berhasil = $this->model->addClient($nama_client, $email_client, $notelp_client, $alamat_client);
             if ($berhasil) {
-                header("Location: index.php?fitur=list&message=Client berhasil ditambahkan");
+                header("Location: index.php?fitur=client&message=Client berhasil ditambahkan");
             } else {
-                header("Location: index.php?fitur=add&message=Gagal menambahkan client");
+                header("Location: index.php?fitur=tambah&message=Gagal menambahkan client");
             }
             exit;
         } else {
@@ -86,71 +54,104 @@ class ControllerClient {
         }
     }
 
-    public function editClient($id_client) {
+    public function updateClient($id_client) {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $nama_client = $_POST['nama_client'];
             $email_client = $_POST['email_client'];
             $notelp_client = $_POST['notelp_client'];
             $alamat_client = $_POST['alamat_client'];
-            $tanggal_daftar = $_POST['tanggal_daftar'];
 
-            $berhasil = $this->model->updateClient($id_client, $nama_client, $email_client, $notelp_client, $alamat_client, $tanggal_daftar);
-
+            $berhasil = $this->model->updateClient($id_client, $nama_client, $email_client, $notelp_client, $alamat_client);
             if ($berhasil) {
-                header("Location: index.php?fitur=list&message=Client berhasil diperbarui");
+                header("Location: index.php?fitur=client&message=Client berhasil diupdate");
             } else {
-                header("Location: index.php?fitur=edit&id_client=$id_client&message=Gagal memperbarui client");
+                header("Location: index.php?fitur=update&id_client=$id_client&message=Gagal mengupdate client");
             }
             exit;
         } else {
             $client = $this->model->getClientById($id_client);
-            include './view/client/clientEdit.php';
+            if (!$client) {
+                header("Location: index.php?fitur=client&message=Client tidak ditemukan");
+                exit;
+            }
+            include './view/client/clientUpdate.php';
         }
     }
 
     public function deleteClient($id_client) {
         $berhasil = $this->model->deleteClient($id_client);
         if ($berhasil) {
-            header("Location: index.php?fitur=list&message=Client berhasil dihapus");
+            header("Location: index.php?fitur=client&message=Client berhasil dihapus");
         } else {
-            header("Location: index.php?fitur=list&message=Gagal menghapus client");
+            header("Location: index.php?fitur=client&message=Gagal menghapus client");
         }
         exit;
     }
 
-    public function listBookings($id_client) {
-        $client = $this->model->getClientById($id_client);
-        $bookings = $this->model->getClientBookings($id_client);
-        include './view/client/bookingList.php';
+    public function listClients() {
+        $clients = $this->model->getClients();
+        include './view/client/clientList.php';
     }
 
-    public function addBooking($id_client) {
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $id_layanan = $_POST['id_layanan'];
-            $tanggal = $_POST['tanggal'];
-            $jam = $_POST['jam'];
-
-            $berhasil = $this->model->addBooking($id_client, $id_layanan, $tanggal, $jam);
-
-            if ($berhasil) {
-                header("Location: index.php?fitur=booking_list&id_client=$id_client&message=Booking berhasil dibuat");
-            } else {
-                header("Location: index.php?fitur=booking_add&id_client=$id_client&message=Gagal membuat booking");
-            }
+    public function handleBooking() {
+        session_start();
+        $step = $_GET['step'] ?? 'pilih_layanan';
+        
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->handleBookingPost();
+            // Redirect to prevent form resubmission
+            header("Location: ?step=" . ($_SESSION['booking']['step'] ?? 'pilih_layanan'));
             exit;
-        } else {
-            include './view/client/bookingAdd.php';
         }
+        
+        // Prepare data for view
+        $data = [
+            'step' => $step,
+            'stylists' => $this->model->getStylists(),
+            'services' => $this->model->getServices(),
+            'paymentMethods' => $this->model->getPaymentMethods(),
+            'booking' => $_SESSION['booking'] ?? []
+        ];
+        
+        include './view/client/clientList.php';
     }
 
-    public function cancelBooking($id_booking, $id_client) {
-        $berhasil = $this->model->cancelBooking($id_booking, $id_client);
-        if ($berhasil) {
-            header("Location: index.php?fitur=booking_list&id_client=$id_client&message=Booking berhasil dibatalkan");
-        } else {
-            header("Location: index.php?fitur=booking_list&id_client=$id_client&message=Gagal membatalkan booking");
+    private function handleBookingPost() {
+        if (isset($_POST['service_id'])) {
+            $services = $this->model->getServices();
+            $_SESSION['booking'] = [
+                'service_id' => $_POST['service_id'],
+                'service_name' => $services[$_POST['service_id']]['nama'],
+                'service_price' => $services[$_POST['service_id']]['harga'],
+                'step' => 'pilih_stylist'
+            ];
         }
-        exit;
+        elseif (isset($_POST['stylist_id'])) {
+            $stylists = $this->model->getStylists();
+            $_SESSION['booking']['stylist_id'] = $_POST['stylist_id'];
+            $_SESSION['booking']['stylist_name'] = $stylists[$_POST['stylist_id']]['nama'];
+            $_SESSION['booking']['step'] = 'pilih_jadwal';
+        }
+        elseif (isset($_POST['tanggal']) && isset($_POST['jam'])) {
+            $_SESSION['booking']['tanggal'] = $_POST['tanggal'];
+            $_SESSION['booking']['jam'] = $_POST['jam'];
+            $_SESSION['booking']['step'] = 'konfirmasi';
+        }
+        elseif (isset($_POST['confirm'])) {
+            $_SESSION['booking']['payment_method'] = $_POST['payment_method'];
+            $_SESSION['booking']['catatan'] = $_POST['catatan'] ?? '';
+            $_SESSION['booking']['step'] = 'selesai';
+            
+            $bookingData = [
+                'id_client' => $_SESSION['id_client'] ?? 2,
+                'service_id' => $_SESSION['booking']['service_id'],
+                'tanggal' => $_SESSION['booking']['tanggal'],
+                'jam' => $_SESSION['booking']['jam'],
+                'status' => 'menunggu'
+            ];
+            
+            $this->model->createBooking($bookingData);
+        }
     }
 }
 ?>

@@ -2,17 +2,17 @@
 include './config/dbconnect.php';
 
 class ModelBooking {
-    public function getAllBooking() {
+    public function getBookings() {
         global $conn;
-        $sql = "SELECT booking.*, client.nama_client, layanan.nama_layanan 
-                FROM booking 
-                JOIN client ON booking.id_client = client.id_client 
-                JOIN layanan ON booking.id_layanan = layanan.id_layanan
-                ORDER BY booking.tanggal DESC";
+        $sql = "SELECT b.*, c.nama_client, l.nama_layanan 
+                FROM booking b
+                JOIN client c ON b.id_client = c.id_client
+                JOIN layanan l ON b.id_layanan = l.id_layanan
+                ORDER BY b.tanggal DESC, b.jam DESC";
         $result = mysqli_query($conn, $sql);
-
         $bookings = [];
-        if ($result->num_rows > 0) {
+
+        if ($result && $result->num_rows > 0) {
             while ($row = mysqli_fetch_assoc($result)) {
                 $bookings[] = $row;
             }
@@ -30,20 +30,21 @@ class ModelBooking {
         return $result->fetch_assoc();
     }
 
-    public function addBooking($id_client, $id_layanan, $tanggal, $jam) {
+    public function addBooking($id_client, $id_layanan, $tanggal, $jam, $status = 'menunggu') {
         global $conn;
-        $sql = "INSERT INTO booking (id_client, id_layanan, tanggal, jam, status) 
-                VALUES (?, ?, ?, ?, 'menunggu')";
+        $sql = "INSERT INTO booking (id_client, id_layanan, tanggal, jam, status) VALUES (?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("iiss", $id_client, $id_layanan, $tanggal, $jam);
+        $stmt->bind_param("iisss", $id_client, $id_layanan, $tanggal, $jam, $status);
         return $stmt->execute();
     }
 
-    public function updateStatus($id_booking, $status) {
+    public function updateBooking($id_booking, $id_client, $id_layanan, $tanggal, $jam, $status) {
         global $conn;
-        $sql = "UPDATE booking SET status = ? WHERE id_booking = ?";
+        $sql = "UPDATE booking 
+                SET id_client = ?, id_layanan = ?, tanggal = ?, jam = ?, status = ? 
+                WHERE id_booking = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("si", $status, $id_booking);
+        $stmt->bind_param("iisssi", $id_client, $id_layanan, $tanggal, $jam, $status, $id_booking);
         return $stmt->execute();
     }
 
@@ -55,25 +56,12 @@ class ModelBooking {
         return $stmt->execute();
     }
 
-    public function getBookingByClient($id_client) {
+    public function updateStatus($id_booking, $status) {
         global $conn;
-        $sql = "SELECT booking.*, layanan.nama_layanan 
-                FROM booking 
-                JOIN layanan ON booking.id_layanan = layanan.id_layanan
-                WHERE booking.id_client = ? 
-                ORDER BY booking.tanggal DESC";
+        $sql = "UPDATE booking SET status = ? WHERE id_booking = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $id_client);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        $bookings = [];
-        if ($result->num_rows > 0) {
-            while ($row = mysqli_fetch_assoc($result)) {
-                $bookings[] = $row;
-            }
-        }
-        return $bookings;
+        $stmt->bind_param("si", $status, $id_booking);
+        return $stmt->execute();
     }
 }
 ?>
