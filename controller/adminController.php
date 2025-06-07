@@ -1,5 +1,5 @@
 <?php
-include './model/adminModel.php';
+include '../model/adminModel.php';
 
 class ControllerAdmin {
     private $model;
@@ -94,6 +94,19 @@ class ControllerAdmin {
             $admins = $this->model->getAdmins();
         }
         include './view/adminList.php';
+    }
+
+    public function authLogin($username, $password) {
+        $admin = $this->model->login($username, $password);
+        if ($admin) {
+            $_SESSION['role'] = 'admin';
+            $_SESSION['username'] = $admin['username'];
+            $_SESSION['user_name'] = $admin['nama_admin'];
+            $_SESSION['user_id'] = $admin['id_admin'];
+            header("Location: ../view/adminDashboard.php");
+            exit;
+        }
+        return false;
     }
 }
 ?>

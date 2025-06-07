@@ -5,6 +5,5 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     exit;
 }
 echo "Selamat datang Admin, " . $_SESSION['username'];
-// Tambahkan menu dan fungsi admin disini
 ?>
 <a href="logout.php">Logout</a>

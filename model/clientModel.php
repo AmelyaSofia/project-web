@@ -73,4 +73,32 @@ class ModelClient {
     public function getAllClients() {
         return $this->getClients();
     }
+
+    public function login($username, $password) {
+        global $conn;
+        $sql = "SELECT * FROM client WHERE username = ? AND password = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ss", $username, $password);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_assoc();
+    }
+
+
+    public function register($data) {
+        global $conn;
+        $sql = "INSERT INTO client (nama_client, email, no_hp, alamat, username, password)
+                VALUES (?, ?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param(
+            "ssssss",
+            $data['nama_client'],
+            $data['email'],
+            $data['no_hp'],
+            $data['alamat'],
+            $data['username'],
+            $data['password']
+        );
+        return $stmt->execute();
+    }
 }

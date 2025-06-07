@@ -1,104 +1,188 @@
 <?php
 session_start();
-include '../model/adminModel.php';
-include '../model/clientModel.php';
-
-$modelAdmin = new ModelAdmin();
-$modelClient = new ModelClient();
+require_once '../controller/adminController.php';
+require_once '../controller/clientController.php';
 
 $message = '';
+$show_register = isset($_GET['register']); // Cek apakah parameter ?register ada
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['action']; // 'login' atau 'register'
+    $action = $_POST['action'] ?? '';
 
-    if ($action === 'register') {
-        // ambil data register
-        $nama_client = $_POST['nama_client'];
-        $email = $_POST['email'];
-        $no_hp = $_POST['no_hp'];
-        $alamat = $_POST['alamat'];
-        $username = $_POST['username'];
-        $password = $_POST['password'];
+    if ($action === 'login') {
+        $username = trim($_POST['username']);
+        $password = trim($_POST['password']);
 
-        // register client
-        $success = $modelClient->addClient($nama_client, $email, $no_hp, $alamat, $username, $password);
+        $adminController = new ControllerAdmin();
+        $clientController = new ControllerClient();
 
-        if ($success) {
-            $message = "Registrasi berhasil, silakan login.";
+        if ($adminController->authLogin($username, $password)) {
+            header("Location: ../view/adminDashboard.php");
+            exit;
+        }
+
+        if ($clientController->authLogin($username, $password)) {
+            header("Location: ../view/clientDashboard.php");
+            exit;
+        }
+
+        $message = "Username atau password salah!";
+
+    } elseif ($action === 'register') {
+        $data = [
+            'nama_client' => trim($_POST['nama_client']),
+            'email' => trim($_POST['email']),
+            'no_hp' => trim($_POST['no_hp']),
+            'alamat' => trim($_POST['alamat']),
+            'username' => trim($_POST['username']),
+            'password' => trim($_POST['password'])
+        ];
+
+        $clientController = new ControllerClient();
+
+        if ($clientController->authRegister($data)) {
+            $message = "Registrasi berhasil! Silakan login.";
         } else {
-            $message = "Registrasi gagal, coba lagi.";
-        }
-    } elseif ($action === 'login') {
-        // ambil data login
-        $username = $_POST['username'];
-        $password = $_POST['password'];
-
-        // Cek login admin dulu
-        $admins = $modelAdmin->getAdmins();
-        $isAdmin = false;
-        foreach ($admins as $admin) {
-            if ($admin['username'] === $username && $password === 'admin') {
-                // password admin disamakan 111
-                $_SESSION['role'] = 'admin'; // GANTI dari user_type
-                $_SESSION['username'] = $admin['username']; // biar konsisten dengan dashboard
-                $_SESSION['user_name'] = $admin['nama_admin'];
-                $_SESSION['user_id'] = $admin['id_admin'];
-                $isAdmin = true;
-                header('Location: adminDashboard.php'); // ganti dengan halaman admin kamu
-                exit;
-            }
-        }
-
-        if (!$isAdmin) {
-            // cek client berdasarkan username dan password biasa
-            $clients = $modelClient->getClients();
-            $isClient = false;
-            foreach ($clients as $client) {
-                if ($client['username'] === $username && $client['password'] === $password) {
-                    $_SESSION['role'] = 'client'; // GANTI dari user_type
-                    $_SESSION['username'] = $client['username'];
-                    $_SESSION['user_name'] = $client['nama_client'];
-                    $_SESSION['user_id'] = $client['id_client'];
-                    $isClient = true;
-                    header('Location: clientDashboard.php'); // ganti dengan halaman client kamu
-                    exit;
-                }
-            }
-            if (!$isClient) {
-                $message = "Login gagal, username atau password salah.";
-            }
+            $message = "Registrasi gagal. Username mungkin sudah digunakan.";
         }
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8" />
-    <title>Login & Register</title>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f0ec;
+            color: #4b3e37;
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .form-container {
+            background-color: #fdfaf6;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        h2 {
+            color: #a68a7d;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        button {
+            background-color: #cfa894;
+            color: white;
+            padding: 10px 15px;
+            width: 100%;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #bfa088;
+        }
+        .link-register {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.95em;
+        }
+        .link-register a {
+            color: #a68a7d;
+            text-decoration: none;
+        }
+        .link-register a:hover {
+            text-decoration: underline;
+        }
+        .message {
+            background-color: #ffe5dc;
+            color: #d9534f;
+            padding: 10px;
+            border-left: 4px solid #d9534f;
+            margin-top: 15px;
+            border-radius: 6px;
+        }
+        .success {
+            background-color: #e6f7e6;
+            color: #28a745;
+            border-left-color: #28a745;
+        }
+    </style>
 </head>
 <body>
-<h2>Login</h2>
-<form method="POST" action="">
-    <input type="hidden" name="action" value="login" />
-    Username: <input type="text" name="username" required /><br/>
-    Password: <input type="password" name="password" required /><br/>
-    <button type="submit">Login</button>
-</form>
 
-<h2>Register Client</h2>
-<form method="POST" action="">
-    <input type="hidden" name="action" value="register" />
-    Nama Client: <input type="text" name="nama_client" required /><br/>
-    Email: <input type="email" name="email" required /><br/>
-    No HP: <input type="text" name="no_hp" required /><br/>
-    Alamat: <input type="text" name="alamat" required /><br/>
-    Username: <input type="text" name="username" required /><br/>
-    Password: <input type="password" name="password" required /><br/>
-    <button type="submit">Register</button>
-</form>
+<div class="form-container">
+    <h2>Login</h2>
 
-<p style="color:red;"><?= $message ?></p>
+    <?php if (!empty($message)): ?>
+        <div class="message <?= strpos($message, 'berhasil') !== false ? 'success' : '' ?>">
+            <?= htmlspecialchars($message) ?>
+        </div>
+    <?php endif; ?>
+
+    <form method="POST" action="">
+        <input type="hidden" name="action" value="login">
+        <div>
+            <label>Username:</label>
+            <input type="text" name="username" required>
+        </div>
+        <div>
+            <label>Password:</label>
+            <input type="password" name="password" required>
+        </div>
+        <button type="submit">Login</button>
+    </form>
+
+    <div class="link-register">
+        Belum punya akun? <a href="?register=true">Register di sini</a>
+    </div>
+
+    <?php if ($show_register): ?>
+        <hr style="margin: 20px 0; border: 1px solid #eee;">
+        <h2 style="margin-top: 0;">Register Client</h2>
+        <form method="POST" action="">
+            <input type="hidden" name="action" value="register">
+            <div>
+                <label>Nama Lengkap:</label>
+                <input type="text" name="nama_client" required>
+            </div>
+            <div>
+                <label>Email:</label>
+                <input type="email" name="email" required>
+            </div>
+            <div>
+                <label>No HP:</label>
+                <input type="text" name="no_hp" required>
+            </div>
+            <div>
+                <label>Alamat:</label>
+                <input type="text" name="alamat" required>
+            </div>
+            <div>
+                <label>Username:</label>
+                <input type="text" name="username" required>
+            </div>
+            <div>
+                <label>Password:</label>
+                <input type="password" name="password" required>
+            </div>
+            <button type="submit">Register</button>
+        </form>
+    <?php endif; ?>
+</div>
+
 </body>
 </html>

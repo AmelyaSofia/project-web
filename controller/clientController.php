@@ -1,5 +1,5 @@
 <?php
-include './model/clientModel.php';
+include '../model/clientModel.php';
 
 class ControllerClient {
     private $model;
@@ -101,5 +101,23 @@ class ControllerClient {
         }
         include './view/clientList.php';
     }
+
+    public function authLogin($username, $password) {
+        $client = $this->model->login($username, $password);
+        if ($client) {
+            $_SESSION['role'] = 'client';
+            $_SESSION['username'] = $client['username'];
+            $_SESSION['user_name'] = $client['nama_client'];
+            $_SESSION['user_id'] = $client['id_client'];
+            header("Location: ../view/clientDashboard.php");
+            exit;
+        }
+        return false;
+    }
+
+public function authRegister($data) {
+    return $this->model->register($data);
+}
+
 }
 ?>
