@@ -1,30 +1,14 @@
 <?php
-$modul = $_GET['modul'] ?? 'layanan';
-$fitur = $_GET['fitur'] ?? 'list';
+session_start();
 
-switch ($modul) {
-    // case 'client':
-    //     include './controller/clientController.php';
-    //     $controller = new ControllerClient();
-    //     $controller->handleRequest($fitur);
-    //     break;
-
-    // case 'admin':
-    //     include './controller/adminController.php';
-    //     $controller = new ControllerAdmin();
-    //     $controller->handleRequest($fitur);
-    //     break;
-
-    case 'layanan':
-        include './controller/layananController.php';
-        $controller = new ControllerLayanan();
-        $controller->handleRequest($fitur);
-        break;
-
-    // case 'karyawan':
-    //     include './controller/karyawanController.php';
-    //     $controller = new ControllerKaryawan();
-    //     $controller->handleRequest($fitur);
-    //     break;
-    
+if (isset($_SESSION['role'])) {
+    if ($_SESSION['role'] === 'admin') {
+        header('Location: ./view/adminDashboard.php');
+    } elseif ($_SESSION['role'] === 'client') {
+        header('Location: ./view/clientDashboard.php');
+    }
+    exit;
 }
+
+header('Location: ./view/login.php');
+exit;

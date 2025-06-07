@@ -1,5 +1,5 @@
 <?php
-include './config/dbconnect.php';
+include '../config/dbconnect.php';
 
 class ModelAdmin {
     public function getAdmins() {
@@ -26,19 +26,19 @@ class ModelAdmin {
         return $result->fetch_assoc();
     }
 
-    public function addAdmin($nama_admin, $email_admin, $password_admin, $foto_admin) {
+    public function addAdmin($username, $password, $nama_admin) {
         global $conn;
-        $sql = "INSERT INTO admin (nama_admin, email_admin, password_admin, foto_admin) VALUES (?, ?, ?, ?)";
+        $sql = "INSERT INTO admin (username, password, nama_admin) VALUES (?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssss", $nama_admin, $email_admin, $password_admin, $foto_admin);
+        $stmt->bind_param("sss", $username, $password, $nama_admin);
         return $stmt->execute();
     }
 
-    public function updateAdmin($id_admin, $nama_admin, $email_admin, $password_admin, $foto_admin) {
+    public function updateAdmin($id_admin, $username, $password, $nama_admin) {
         global $conn;
-        $sql = "UPDATE admin SET nama_admin = ?, email_admin = ?, password_admin = ?, foto_admin = ? WHERE id_admin = ?";
+        $sql = "UPDATE admin SET username = ?, password = ?, nama_admin = ? WHERE id_admin = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssssi", $nama_admin, $email_admin, $password_admin, $foto_admin, $id_admin);
+        $stmt->bind_param("sssi", $username, $password, $nama_admin, $id_admin);
         return $stmt->execute();
     }
 
@@ -52,7 +52,7 @@ class ModelAdmin {
 
     public function searchAdmin($keyword) {
         global $conn;
-        $sql = "SELECT * FROM admin WHERE nama_admin LIKE ? OR email_admin LIKE ?";
+        $sql = "SELECT * FROM admin WHERE username LIKE ? OR nama_admin LIKE ?";
         $stmt = $conn->prepare($sql);
         $keyword = "%$keyword%";
         $stmt->bind_param("ss", $keyword, $keyword);
@@ -71,30 +71,4 @@ class ModelAdmin {
     public function getAllAdmins() {
         return $this->getAdmins();
     }
-
-    public function getAllBookings() {
-        global $conn;
-        $sql = "SELECT b.*, c.nama_client, l.nama_layanan 
-                FROM booking b
-                JOIN client c ON b.id_client = c.id_client
-                JOIN layanan l ON b.id_layanan = l.id_layanan
-                ORDER BY b.tanggal DESC, b.jam DESC";
-        $result = mysqli_query($conn, $sql);
-        $bookings = [];
-        if ($result->num_rows > 0) {
-            while ($row = mysqli_fetch_assoc($result)) {
-                $bookings[] = $row;
-            }
-        }
-        return $bookings;
-    }
-
-    public function updateBookingStatus($id_booking, $status) {
-        global $conn;
-        $sql = "UPDATE booking SET status = ? WHERE id_booking = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("si", $status, $id_booking);
-        return $stmt->execute();
-    }
 }
-?>

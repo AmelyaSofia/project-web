@@ -2,7 +2,7 @@
 include './model/adminModel.php';
 
 class ControllerAdmin {
-    private $model; 
+    private $model;
 
     public function __construct() {
         $this->model = new ModelAdmin();
@@ -10,7 +10,6 @@ class ControllerAdmin {
 
     public function handleRequest($fitur) {
         $id_admin = $_GET['id_admin'] ?? null;
-        $id_booking = $_GET['id_booking'] ?? null;
 
         switch ($fitur) {
             case 'tambah':
@@ -24,20 +23,10 @@ class ControllerAdmin {
                 }
                 break;
             case 'hapus':
-                if($id_admin) {
+                if ($id_admin) {
                     $this->deleteAdmin((int)$id_admin);
                 } else {
                     header("Location: index.php?fitur=admin");
-                }
-                break;
-            case 'booking_list':
-                $this->listAllBookings();
-                break;
-            case 'booking_update_status':
-                if ($id_booking && $_SERVER['REQUEST_METHOD'] == 'POST') {
-                    $this->updateBookingStatus($id_booking);
-                } else {
-                    header("Location: index.php?fitur=booking_list");
                 }
                 break;
             default:
@@ -48,33 +37,31 @@ class ControllerAdmin {
 
     public function addAdmin() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $username = $_POST['username'];
+            $password = $_POST['password'];
             $nama_admin = $_POST['nama_admin'];
-            $email_admin = $_POST['email_admin'];
-            $password_admin = $_POST['password_admin'];
-            $foto_admin = $_POST['foto_admin'];
 
-            $berhasil = $this->model->addAdmin($nama_admin, $email_admin, $password_admin, $foto_admin);
+            $berhasil = $this->model->addAdmin($username, $password, $nama_admin);
             if ($berhasil) {
-                header("Location: index.php?fitur=list&message=Admin berhasil ditambahkan");
+                header("Location: index.php?fitur=admin&message=Admin berhasil ditambahkan");
             } else {
-                header("Location: index.php?fitur=add&message=Gagal menambahkan admin");
+                header("Location: index.php?fitur=tambah&message=Gagal menambahkan admin");
             }
             exit;
         } else {
-            include './view/admin/adminAdd.php';
+            include './view/adminList.php';
         }
     }
 
     public function updateAdmin($id_admin) {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $username = $_POST['username'];
+            $password = $_POST['password'];
             $nama_admin = $_POST['nama_admin'];
-            $email_admin = $_POST['email_admin'];
-            $password_admin = $_POST['password_admin'];
-            $foto_admin = $_POST['foto_admin'];
 
-            $terupdate = $this->model->updateAdmin($id_admin, $nama_admin, $email_admin, $password_admin, $foto_admin);
+            $terupdate = $this->model->updateAdmin($id_admin, $username, $password, $nama_admin);
             if ($terupdate) {
-                header("Location: index.php?fitur=list&message=Admin berhasil diupdate");
+                header("Location: index.php?fitur=admin&message=Admin berhasil diupdate");
             } else {
                 header("Location: index.php?fitur=update&id_admin=$id_admin&message=Gagal mengupdate admin");
             }
@@ -82,19 +69,19 @@ class ControllerAdmin {
         } else {
             $admin = $this->model->getAdminById($id_admin);
             if (!$admin) {
-                header("Location: index.php?fitur=list&message=Admin tidak ditemukan");
+                header("Location: index.php?fitur=admin&message=Admin tidak ditemukan");
                 exit;
             }
-            include './view/admin/adminUpdate.php';
+            include './view/adminList.php';
         }
     }
 
     public function deleteAdmin($id_admin) {
-        $terhapus = $this->model->deleteAdmin($id_admin);
-        if ($terhapus) {
-            header("Location: index.php?fitur=list&message=Admin berhasil dihapus");
+        $berhasil = $this->model->deleteAdmin($id_admin);
+        if ($berhasil) {
+            header("Location: index.php?fitur=admin&message=Admin berhasil dihapus");
         } else {
-            header("Location: index.php?fitur=list&message=Gagal menghapus admin");
+            header("Location: index.php?fitur=admin&message=Gagal menghapus admin");
         }
         exit;
     }
@@ -106,27 +93,7 @@ class ControllerAdmin {
         } else {
             $admins = $this->model->getAdmins();
         }
-        include './view/admin/adminList.php';
-    }
-
-    public function listAllBookings() {
-        $bookings = $this->model->getAllBookings();
-        include './view/admin/bookingList.php';
-    }
-
-    public function updateBookingStatus($id_booking) {
-        $status = $_POST['status'] ?? null;
-        if ($status && in_array($status, ['terjadwal', 'selesai', 'batal'])) {
-            $berhasil = $this->model->updateBookingStatus($id_booking, $status);
-            if ($berhasil) {
-                header("Location: index.php?fitur=booking_list&message=Status booking berhasil diupdate");
-            } else {
-                header("Location: index.php?fitur=booking_list&message=Gagal update status booking");
-            }
-        } else {
-            header("Location: index.php?fitur=booking_list&message=Status tidak valid");
-        }
-        exit;
+        include './view/adminList.php';
     }
 }
 ?>
