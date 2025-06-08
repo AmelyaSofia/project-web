@@ -19,14 +19,16 @@ class ControllerStylist {
                 if ($id_stylist) {
                     $this->updateStylist($id_stylist);
                 } else {
-                    header("Location: index.php?fitur=stylist");
+                    header("Location: index.php?modul=stylist&fitur=stylist");
+                    exit;
                 }
                 break;
             case 'hapus':
                 if ($id_stylist) {
                     $this->deleteStylist((int)$id_stylist);
                 } else {
-                    header("Location: index.php?fitur=stylist");
+                    header("Location: index.php?modul=stylist&fitur=stylist");
+                    exit;
                 }
                 break;
             default:
@@ -37,14 +39,15 @@ class ControllerStylist {
 
     public function addStylist() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $nama_stylist = $_POST['nama_stylist'];
-            $keahlian = $_POST['keahlian'];
+            $nama_stylist = htmlspecialchars(trim($_POST['nama_stylist']));
+            $keahlian = htmlspecialchars(trim($_POST['keahlian']));
 
             $berhasil = $this->model->addStylist($nama_stylist, $keahlian);
+
             if ($berhasil) {
-                header("Location: index.php?fitur=stylist&message=Stylist berhasil ditambahkan");
+                header("Location: index.php?modul=stylist&fitur=stylist&message=Stylist berhasil ditambahkan");
             } else {
-                header("Location: index.php?fitur=tambah&message=Gagal menambahkan stylist");
+                header("Location: index.php?modul=stylist&fitur=tambah&message=Gagal menambahkan stylist");
             }
             exit;
         } else {
@@ -54,20 +57,21 @@ class ControllerStylist {
 
     public function updateStylist($id_stylist) {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $nama_stylist = $_POST['nama_stylist'];
-            $keahlian = $_POST['keahlian'];
+            $nama_stylist = htmlspecialchars(trim($_POST['nama_stylist']));
+            $keahlian = htmlspecialchars(trim($_POST['keahlian']));
 
             $terupdate = $this->model->updateStylist($id_stylist, $nama_stylist, $keahlian);
+
             if ($terupdate) {
-                header("Location: index.php?fitur=stylist&message=Stylist berhasil diupdate");
+                header("Location: index.php?modul=stylist&fitur=stylist&message=Stylist berhasil diupdate");
             } else {
-                header("Location: index.php?fitur=update&id_stylist=$id_stylist&message=Gagal mengupdate stylist");
+                header("Location: index.php?modul=stylist&fitur=update&id_stylist=$id_stylist&message=Gagal mengupdate stylist");
             }
             exit;
         } else {
             $stylist = $this->model->getStylistById($id_stylist);
             if (!$stylist) {
-                header("Location: index.php?fitur=stylist&message=Stylist tidak ditemukan");
+                header("Location: index.php?modul=stylist&fitur=stylist&message=Stylist tidak ditemukan");
                 exit;
             }
             include './view/stylistList.php';
@@ -76,10 +80,11 @@ class ControllerStylist {
 
     public function deleteStylist($id_stylist) {
         $berhasil = $this->model->deleteStylist($id_stylist);
+
         if ($berhasil) {
-            header("Location: index.php?fitur=stylist&message=Stylist berhasil dihapus");
+            header("Location: index.php?modul=stylist&fitur=stylist&message=Stylist berhasil dihapus");
         } else {
-            header("Location: index.php?fitur=stylist&message=Gagal menghapus stylist");
+            header("Location: index.php?modul=stylist&fitur=stylist&message=Gagal menghapus stylist");
         }
         exit;
     }
@@ -87,7 +92,7 @@ class ControllerStylist {
     public function listStylists() {
         $keyword = $_GET['search'] ?? null;
         if ($keyword) {
-            $stylists = $this->model->searchStylist($keyword);
+            $stylists = $this->model->searchStylist(htmlspecialchars(trim($keyword)));
         } else {
             $stylists = $this->model->getStylists();
         }
