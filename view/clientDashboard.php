@@ -497,7 +497,7 @@ $layanans = mysqli_query($conn, $query);
     </nav>
 
     <!-- Animated Hero Banner -->
-    <div class="hero-banner">
+    <div class="hero-banner" id="dashboard">
         <!-- Slide 1 -->
         <div class="banner-slide active" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('../image/banner.jpg');">
             <div class="banner-content">

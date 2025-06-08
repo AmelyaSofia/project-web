@@ -4,7 +4,7 @@ require_once '../controller/adminController.php';
 require_once '../controller/clientController.php';
 
 $message = '';
-$show_register = isset($_GET['register']); // Cek apakah parameter ?register ada
+$show_register = isset($_GET['register']); 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
