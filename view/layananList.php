@@ -44,7 +44,7 @@
     <div class="form-container">
     <?php if (isset($_GET['fitur']) && $_GET['fitur'] == 'update' && isset($layanan)): ?>
         <h2>Update Layanan</h2>
-        <form method="POST" action="index.php?fitur=update&id_layanan=<?php echo $layanan['id_layanan']; ?>" enctype="multipart/form-data">
+        <form method="POST" action="index.php?modul=layanan&fitur=update&id_layanan=<?php echo $layanan['id_layanan']; ?>" enctype="multipart/form-data">
             <div class="mb-3">
                 <label class="form-label">Nama Layanan:</label>
                 <input type="text" class="form-control" name="nama_layanan" value="<?php echo htmlspecialchars($layanan['nama_layanan']); ?>" required>
@@ -87,7 +87,7 @@
         </form>
     <?php else: ?>
         <h2>Tambah Layanan</h2>
-        <form method="POST" action="index.php?fitur=tambah" enctype="multipart/form-data">
+        <form method="POST" action="index.php?modul=layanan&fitur=tambah" enctype="multipart/form-data">
             <div class="mb-3">
                 <label class="form-label">Nama Layanan:</label>
                 <input type="text" class="form-control" name="nama_layanan" required>
@@ -149,8 +149,8 @@
                             <?php endif; ?>
                         </td>
                         <td>
-                            <a href="index.php?fitur=update&id_layanan=<?php echo $l['id_layanan']; ?>">Edit</a> |
-                            <a href="index.php?fitur=hapus&id_layanan=<?php echo $l['id_layanan']; ?>" onclick="return confirm('Apakah Anda yakin ingin menghapus layanan ini?')">Hapus</a>
+                            <a href="index.php?modul=layanan&fitur=update&id_layanan=<?php echo $l['id_layanan']; ?>" enctype="multipart/form-data">Edit</a> |
+                            <a href="index.php?modul=layanan&fitur=hapus&id_layanan=<?php echo $l['id_layanan']; ?>" onclick="return confirm('Apakah Anda yakin ingin menghapus layanan ini?')">Hapus</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

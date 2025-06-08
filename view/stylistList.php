@@ -38,7 +38,7 @@
     <div class="form-container">
         <?php if (isset($_GET['fitur']) && $_GET['fitur'] == 'update' && isset($stylist)): ?>
             <h2>Update Stylist</h2>
-            <form method="POST" action="index.php?fitur=update&id_stylist=<?php echo $stylist['id_stylist']; ?>">
+            <form method="POST" action="index.php?modul=stylist&fitur=update&id_stylist=<?php echo $stylist['id_stylist']; ?>">
                 <label>Nama Stylist:</label><br>
                 <input type="text" name="nama_stylist" value="<?php echo htmlspecialchars($stylist['nama_stylist']); ?>" required><br>
 
@@ -50,7 +50,7 @@
             </form>
         <?php else: ?>
             <h2>Tambah Stylist</h2>
-            <form method="POST" action="index.php?fitur=tambah">
+            <form method="POST" action="index.php?modul=stylist&fitur=tambah" enctype="multipart/form-data">
                 <label>Nama Stylist:</label><br>
                 <input type="text" name="nama_stylist" required><br>
 
@@ -80,8 +80,8 @@
                         <td><?php echo htmlspecialchars($s['nama_stylist']); ?></td>
                         <td><?php echo htmlspecialchars($s['keahlian']); ?></td>
                         <td>
-                            <a href="index.php?fitur=update&id_stylist=<?php echo $s['id_stylist']; ?>">Edit</a> |
-                            <a href="index.php?fitur=hapus&id_stylist=<?php echo $s['id_stylist']; ?>" onclick="return confirm('Yakin ingin hapus stylist ini?')">Hapus</a>
+                            <a href="index.php?modul=stylist&fitur=update&id_stylist=<?php echo $s['id_stylist']; ?>">Edit</a> |
+                            <a href="index.php?modul=stylist&fitur=hapus&id_stylist=<?php echo $s['id_stylist']; ?>" onclick="return confirm('Yakin ingin hapus stylist ini?')">Hapus</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
