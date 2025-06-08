@@ -13,15 +13,15 @@ session_start();
 // exit;
 
 
-$modul = $_GET['modul'] ?? 'layanan';
+$modul = $_GET['modul'] ?? 'stylist';
 $fitur = $_GET['fitur'] ?? 'list';
 
 switch ($modul) {
-    case 'layanan':
-        include './controller/layananController.php';
-        $controllerLayanan = new ControllerLayanan();
-        $controllerLayanan->handleRequest($fitur);
-        break;
+    // case 'layanan':
+    //     include './controller/layananController.php';
+    //     $controllerLayanan = new ControllerLayanan();
+    //     $controllerLayanan->handleRequest($fitur);
+    //     break;
         case 'stylist':
         include './controller/stylistController.php';
         $controllerStylist = new ControllerStylist();
