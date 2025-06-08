@@ -182,13 +182,7 @@ $layanans = mysqli_query($conn, $query);
                         <a class="nav-link" href="#">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Services</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Gallery</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Testimonials</a>
+                        <a class="nav-link" href="#services">Services</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Contact</a>
@@ -213,7 +207,7 @@ $layanans = mysqli_query($conn, $query);
     </div>
 
     <!-- Main Content -->
-    <div class="container services-section">
+    <div id="services" class="container services-section">
         <h2 class="section-title">Our Premium Services</h2>
         
         <div class="row">
