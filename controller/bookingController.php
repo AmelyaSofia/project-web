@@ -27,7 +27,7 @@ class ControllerBooking {
                 if ($id_booking) {
                     $this->deleteBooking((int)$id_booking);
                 } else {
-                    header("Location: index.php?fitur=booking");
+                    header("Location: index.php?modul=booking&fitur=booking");
                     exit;
                 }
                 break;
@@ -35,7 +35,7 @@ class ControllerBooking {
                 if ($id_booking && isset($_POST['status'])) {
                     $this->updateStatus($id_booking, $_POST['status']);
                 } else {
-                    header("Location: index.php?fitur=booking");
+                    header("Location: index.php?modul=booking&fitur=booking");
                     exit;
                 }
                 break;
@@ -56,13 +56,12 @@ class ControllerBooking {
 
             $berhasil = $this->model->addBooking($id_client, $id_stylist, $id_layanan, $tanggal, $waktu, $catatan);
             if ($berhasil) {
-                header("Location: index.php?fitur=booking&message=Booking berhasil ditambahkan");
+                header("Location: index.php?modul=booking&fitur=booking&message=Booking berhasil ditambahkan");
             } else {
-                header("Location: index.php?fitur=tambah&message=Gagal menambahkan booking");
+                header("Location: index.php?modul=booking&fitur=tambah&message=Gagal menambahkan booking");
             }
             exit;
         } else {
-            // Load data untuk dropdown, misal client, stylist, layanan
             include './model/ModelClient.php';
             include './model/ModelStylist.php';
             include './model/ModelLayanan.php';
@@ -75,7 +74,7 @@ class ControllerBooking {
             $stylists = $stylistModel->getStylists();
             $layanans = $layananModel->getLayanans();
 
-            include './view/booking/bookingAdd.php';
+            include './view/bookingList.php';
         }
     }
 
@@ -91,15 +90,15 @@ class ControllerBooking {
 
             $terupdate = $this->model->updateBooking($id_booking, $id_client, $id_stylist, $id_layanan, $tanggal, $waktu, $status, $catatan);
             if ($terupdate) {
-                header("Location: index.php?fitur=booking&message=Booking berhasil diupdate");
+                header("Location: index.php?modul=booking&fitur=booking&message=Booking berhasil diupdate");
             } else {
-                header("Location: index.php?fitur=update&id_booking=$id_booking&message=Gagal mengupdate booking");
+                header("Location: index.php?modul=booking&fitur=update&id_booking=$id_booking&message=Gagal mengupdate booking");
             }
             exit;
         } else {
             $booking = $this->model->getBookingById($id_booking);
             if (!$booking) {
-                header("Location: index.php?fitur=booking&message=Booking tidak ditemukan");
+                header("Location: index.php?modul=booking&fitur=booking&message=Booking tidak ditemukan");
                 exit;
             }
 
@@ -115,7 +114,7 @@ class ControllerBooking {
             $stylists = $stylistModel->getStylists();
             $layanans = $layananModel->getLayanans();
 
-            include './view/booking/bookingUpdate.php';
+            include './view/bookingList.php';
         }
     }
 
@@ -124,12 +123,12 @@ class ControllerBooking {
         if (in_array($status, $valid_status)) {
             $berhasil = $this->model->updateStatus($id_booking, $status);
             if ($berhasil) {
-                header("Location: index.php?fitur=booking&message=Status booking berhasil diubah");
+                header("Location: index.php?modul=booking&fitur=booking&message=Status booking berhasil diubah");
             } else {
-                header("Location: index.php?fitur=booking&message=Gagal mengubah status booking");
+                header("Location: index.php?modul=booking&fitur=booking&message=Gagal mengubah status booking");
             }
         } else {
-            header("Location: index.php?fitur=booking&message=Status tidak valid");
+            header("Location: index.php?modul=booking&fitur=booking&message=Status tidak valid");
         }
         exit;
     }
@@ -137,9 +136,9 @@ class ControllerBooking {
     public function deleteBooking($id_booking) {
         $berhasil = $this->model->deleteBooking($id_booking);
         if ($berhasil) {
-            header("Location: index.php?fitur=booking&message=Booking berhasil dihapus");
+            header("Location: index.php?modul=booking&fitur=booking&message=Booking berhasil dihapus");
         } else {
-            header("Location: index.php?fitur=booking&message=Gagal menghapus booking");
+            header("Location: index.php?modul=booking&fitur=booking&message=Gagal menghapus booking");
         }
         exit;
     }
@@ -151,7 +150,7 @@ class ControllerBooking {
         } else {
             $bookings = $this->model->getBookings();
         }
-        include './view/booking/bookingList.php';
+        include './view/bookingList.php';
     }
 }
 ?>

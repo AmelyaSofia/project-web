@@ -1,61 +1,61 @@
-<!-- include/sidebar.php -->
-<aside class="w-64 bg-[#6d4c41] text-white fixed top-0 left-0 h-full p-6 space-y-6 shadow-lg z-50">
-  <div class="text-xl font-serif font-bold text-center text-[#fbe9e7] tracking-wide">ROYAL SALON</div>
-  <nav class="space-y-2 text-sm">
-    <!-- Dashboard -->
-    <a href="#" class="flex items-center gap-3 p-3 rounded-md hover:bg-[#5d4037] transition-all duration-200">
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 stroke-current" fill="none" viewBox="0 0 24 24">
-        <path d="M3 13h8V3H3v10zm10 8h8v-6h-8v6zm0-8h8V3h-8v10zM3 21h8v-6H3v6z"/>
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet">
+
+<!-- Sidebar -->
+<aside class="w-64 h-screen fixed top-0 left-0 bg-[#967E76] text-white shadow-md p-6 space-y-6">
+  <!-- Brand -->
+  <div class="text-2xl font-bold text-center text-[#EEE3CB]" style="font-family: 'Playfair Display', serif;">
+    ROYAL BEAUTY
+  </div>
+
+  <!-- Navigation -->
+  <nav class="space-y-3 text-sm" style="font-family: 'Inter', sans-serif;">
+    <a href="admindashboard.php" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-[#D7C0AE] transition">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+        viewBox="0 0 24 24">
+        <path d="M3 12l2-2m0 0l7-7 7 7M13 5v6h6v2a9 9 0 11-18 0v-2h6V5z" />
       </svg>
-      <span>Dashboard</span>
+      Dashboard
     </a>
 
-    <!-- Client -->
-    <a href="../index.php?modul=client&fitur=list" class="flex items-center gap-3 p-3 rounded-md hover:bg-[#5d4037] transition-all duration-200">
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 stroke-current" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-        <circle cx="12" cy="7" r="4"></circle>
-        <path d="M5.5 21a8.38 8.38 0 0113 0"></path>
+    <a href="../index.php?modul=client&fitur=list" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-[#D7C0AE] transition">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+        viewBox="0 0 24 24">
+        <path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a4 4 0 00-4 4v1h8v-1a4 4 0 00-4-4z" />
       </svg>
-      <span>Client</span>
+      Client
     </a>
 
-    <!-- Data Stylist -->
-    <a href="../index.php?modul=stylist&fitur=list" class="flex items-center gap-3 p-3 rounded-md hover:bg-[#5d4037] transition-all duration-200">
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 stroke-current" fill="none" viewBox="0 0 24 24">
-        <path d="M12 12c2.21 0 4-1.79 4-4S14.21 4 12 4 8 5.79 8 8s1.79 4 4 4z"/>
-        <path d="M4 20v-1c0-2.21 3.58-4 8-4s8 1.79 8 4v1"/>
+    <a href="../index.php?modul=stylist&fitur=list" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-[#D7C0AE] transition">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+        viewBox="0 0 24 24">
+        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4S8 5.79 8 8s1.79 4 4 4zm0 2c-3.31 0-6 2.69-6 6h12c0-3.31-2.69-6-6-6z"/>
       </svg>
-      <span>Data Stylist</span>
+      Stylist
     </a>
 
-    <!-- Layanan (scissors icon) -->
-    <a href="../index.php?modul=layanan&fitur=list" class="flex items-center gap-3 p-3 rounded-md hover:bg-[#5d4037] transition-all duration-200">
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 stroke-current" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-        <circle cx="6" cy="6" r="3"></circle>
-        <circle cx="6" cy="18" r="3"></circle>
-        <line x1="20" y1="4" x2="8.12" y2="15.88"></line>
-        <line x1="14.47" y1="14.48" x2="20" y2="20"></line>
-        <line x1="8.12" y1="8.12" x2="12" y2="12"></line>
+    <a href="../index.php?modul=layanan&fitur=list" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-[#D7C0AE] transition">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+        viewBox="0 0 24 24">
+        <path d="M3 3h18v4H3V3zm0 6h18v4H3V9zm0 6h18v4H3v-4z"/>
       </svg>
-      <span>Layanan</span>
+      Layanan
     </a>
 
-    <!-- Booking -->
-    <a href="#" class="flex items-center gap-3 p-3 rounded-md hover:bg-[#5d4037] transition-all duration-200">
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 stroke-current" fill="none" viewBox="0 0 24 24">
-        <rect width="18" height="18" x="3" y="4" rx="2"/>
-        <path d="M16 2v4M8 2v4M3 10h18"/>
+    <a href="../index.php?modul=booking&fitur=list" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-[#D7C0AE] transition">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+        viewBox="0 0 24 24">
+        <path d="M8 7V3m8 4V3M3 11h18M5 19h14a2 2 0 002-2v-6H3v6a2 2 0 002 2z"/>
       </svg>
-      <span>Booking</span>
+      Booking
     </a>
 
-    <!-- Logout -->
-    <a href="logout.php" class="flex items-center gap-3 p-3 rounded-md hover:bg-red-600 transition-all duration-200 mt-4 text-red-200">
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 stroke-current" fill="none" viewBox="0 0 24 24">
-        <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/>
-        <path d="M10 17l5-5-5-5M15 12H3"/>
+    <a href="logout.php" class="flex items-center gap-3 px-4 py-2 mt-6 rounded-lg bg-red-500 hover:bg-red-600 transition">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+        viewBox="0 0 24 24">
+        <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"/>
       </svg>
-      <span>Logout</span>
+      Logout
     </a>
   </nav>
 </aside>
