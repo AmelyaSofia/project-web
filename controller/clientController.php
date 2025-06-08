@@ -19,14 +19,14 @@ class ControllerClient {
                 if ($id_client) {
                     $this->updateClient($id_client);
                 } else {
-                    header("Location: index.php?fitur=client");
+                    header("Location: index.php?modul=client&fitur=client");
                 }
                 break;
             case 'hapus':
                 if ($id_client) {
                     $this->deleteClient((int)$id_client);
                 } else {
-                    header("Location: index.php?fitur=client");
+                    header("Location: index.php?modul=client&fitur=client");
                 }
                 break;
             default:
@@ -46,9 +46,9 @@ class ControllerClient {
 
             $berhasil = $this->model->addClient($nama_client, $email, $no_hp, $alamat, $username, $password);
             if ($berhasil) {
-                header("Location: index.php?fitur=client&message=Client berhasil ditambahkan");
+                header("Location: index.php?modul=client&fitur=client&message=Client berhasil ditambahkan");
             } else {
-                header("Location: index.php?fitur=tambah&message=Gagal menambahkan client");
+                header("Location: index.php?modul=clientfitur=tambah&message=Gagal menambahkan client");
             }
             exit;
         } else {
@@ -67,15 +67,15 @@ class ControllerClient {
 
             $terupdate = $this->model->updateClient($id_client, $nama_client, $email, $no_hp, $alamat, $username, $password);
             if ($terupdate) {
-                header("Location: index.php?fitur=client&message=Client berhasil diupdate");
+                header("Location: index.php?modul=client&fitur=client&message=Client berhasil diupdate");
             } else {
-                header("Location: index.php?fitur=update&id_client=$id_client&message=Gagal mengupdate client");
+                header("Location: index.php?modul=client&fitur=update&id_client=$id_client&message=Gagal mengupdate client");
             }
             exit;
         } else {
             $client = $this->model->getClientById($id_client);
             if (!$client) {
-                header("Location: index.php?fitur=client&message=Client tidak ditemukan");
+                header("Location: index.php?modul&client&fitur=client&message=Client tidak ditemukan");
                 exit;
             }
             include './view/clientList.php';
@@ -85,9 +85,9 @@ class ControllerClient {
     public function deleteClient($id_client) {
         $berhasil = $this->model->deleteClient($id_client);
         if ($berhasil) {
-            header("Location: index.php?fitur=client&message=Client berhasil dihapus");
+            header("Location: index.php?modul=client&fitur=client&message=Client berhasil dihapus");
         } else {
-            header("Location: index.php?fitur=client&message=Gagal menghapus client");
+            header("Location: index.php?modul=client&fitur=client&message=Gagal menghapus client");
         }
         exit;
     }

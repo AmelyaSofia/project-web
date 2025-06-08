@@ -38,7 +38,7 @@
     <div class="form-container">
         <?php if (isset($_GET['fitur']) && $_GET['fitur'] == 'update' && isset($client)): ?>
             <h2>Update Client</h2>
-            <form method="POST" action="index.php?fitur=update&id_client=<?php echo $client['id_client']; ?>">
+            <form method="POST" action="index.php?modul=client&fitur=update&id_client=<?php echo $client['id_client']; ?>">
                 <label>Nama:</label><br>
                 <input type="text" name="nama_client" value="<?php echo htmlspecialchars($client['nama_client']); ?>" required><br>
 
@@ -62,7 +62,7 @@
             </form>
         <?php else: ?>
             <h2>Tambah Client</h2>
-            <form method="POST" action="index.php?fitur=tambah">
+            <form method="POST" action="index.php?modul=client&fitur=tambah">
                 <label>Nama:</label><br>
                 <input type="text" name="nama_client" required><br>
 
@@ -110,8 +110,8 @@
                         <td><?php echo htmlspecialchars($c['alamat']); ?></td>
                         <td><?php echo htmlspecialchars($c['username']); ?></td>
                         <td>
-                            <a href="index.php?fitur=update&id_client=<?php echo $c['id_client']; ?>">Edit</a> |
-                            <a href="index.php?fitur=hapus&id_client=<?php echo $c['id_client']; ?>" onclick="return confirm('Yakin ingin hapus client ini?')">Hapus</a>
+                            <a href="index.php?modul=client&fitur=update&id_client=<?php echo $c['id_client']; ?>">Edit</a> |
+                            <a href="index.php?modul=client&fitur=hapus&id_client=<?php echo $c['id_client']; ?>" onclick="return confirm('Yakin ingin hapus client ini?')">Hapus</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
