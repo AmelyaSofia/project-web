@@ -1,5 +1,5 @@
 <?php
-include '../model/clientModel.php';
+include __DIR__.'/../model/clientModel.php';
 
 class ControllerClient {
     private $model;

@@ -1,5 +1,5 @@
 <?php
-include '../config/dbconnect.php';
+include __DIR__.'/../config/dbconnect.php';
 
 class ModelClient {
     public function getClients() {
