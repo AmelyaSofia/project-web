@@ -4,7 +4,7 @@ include __DIR__.'/../config/dbconnect.php';
 class ModelBooking {
     public function getBookings() {
         global $conn;
-        $sql = "SELECT b.*, c.nama_client, s.nama_stylist, l.nama_layanan 
+        $sql = "SELECT b.*, c.nama_client, s.nama_stylist, l.nama_layanan, l.harga
                 FROM booking b
                 JOIN client c ON b.id_client = c.id_client
                 JOIN stylist s ON b.id_stylist = s.id_stylist
@@ -67,7 +67,7 @@ class ModelBooking {
     public function searchBooking($keyword) {
         global $conn;
         $keyword = "%$keyword%";
-        $sql = "SELECT b.*, c.nama_client, s.nama_stylist, l.nama_layanan
+        $sql = "SELECT b.*, c.nama_client, s.nama_stylist, l.nama_layanan, l.harga
                 FROM booking b
                 JOIN client c ON b.id_client = c.id_client
                 JOIN stylist s ON b.id_stylist = s.id_stylist
@@ -90,7 +90,7 @@ class ModelBooking {
 
     public function getBookingByClient($id_client) {
     global $conn;
-    $sql = "SELECT b.*, c.nama_client, s.nama_stylist, l.nama_layanan
+    $sql = "SELECT b.*, c.nama_client, s.nama_stylist, l.nama_layanan, l.harga
             FROM booking b
             JOIN client c ON b.id_client = c.id_client
             JOIN stylist s ON b.id_stylist = s.id_stylist

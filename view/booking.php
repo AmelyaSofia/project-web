@@ -370,9 +370,14 @@ $layanan = $controller->modelLayanan->getLayananById($id_layanan);
                         </div>
                     <?php endif; ?>
 
-                    <div class="service-info">
+                    <!-- <div class="service-info">
                         <h5>Layanan yang dipilih:</h5>
                         <p class="mb-0"><?= htmlspecialchars($layanan['nama_layanan'] ?? 'Tidak dikenali') ?></p>
+                    </div> -->
+                    <div class="service-info">
+                        <h5>Layanan yang dipilih:</h5>
+                        <p class="mb-1"><strong><?= htmlspecialchars($layanan['nama_layanan'] ?? 'Tidak ditemukan') ?></strong></p>
+                        <p class="mb-0">Harga: Rp <?= number_format($layanan['harga'] ?? 0, 0, ',', '.') ?></p>
                     </div>
 
                     <form method="POST">

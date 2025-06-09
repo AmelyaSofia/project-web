@@ -135,7 +135,7 @@
         <!-- Table -->
         <div class="overflow-x-auto">
             <table class="w-full border text-sm text-left bg-white shadow-md rounded-xl">
-                <thead class="bg-[#967E76] text-white">
+                <!-- <thead class="bg-[#967E76] text-white">
                     <tr>
                         <th class="p-3">ID</th>
                         <th class="p-3">Client</th>
@@ -147,7 +147,22 @@
                         <th class="p-3">Catatan</th>
                         <th class="p-3">Aksi</th>
                     </tr>
+                </thead> -->
+                <thead class="bg-[#967E76] text-white">
+                    <tr>
+                        <th class="p-3">ID</th>
+                        <th class="p-3">Client</th>
+                        <th class="p-3">Stylist</th>
+                        <th class="p-3">Layanan</th>
+                        <th class="p-3">Harga</th> <!-- Tambahan -->
+                        <th class="p-3">Tanggal</th>
+                        <th class="p-3">Waktu</th>
+                        <th class="p-3">Status</th>
+                        <th class="p-3">Catatan</th>
+                        <th class="p-3">Aksi</th>
+                    </tr>
                 </thead>
+
                 <tbody>
                     <?php if (!empty($bookings)): ?>
                         <?php foreach ($bookings as $b): ?>
@@ -156,6 +171,7 @@
                                 <td class="p-3"><?php echo htmlspecialchars($b['nama_client']); ?></td>
                                 <td class="p-3"><?php echo htmlspecialchars($b['nama_stylist']); ?></td>
                                 <td class="p-3"><?php echo htmlspecialchars($b['nama_layanan']); ?></td>
+                                <td class="p-3">Rp <?php echo number_format($b['harga'], 0, ',', '.'); ?></td>
                                 <td class="p-3"><?php echo htmlspecialchars($b['tanggal']); ?></td>
                                 <td class="p-3"><?php echo htmlspecialchars($b['waktu']); ?></td>
                                 <td class="p-3"><?php echo ucfirst(htmlspecialchars($b['status'])); ?></td>
