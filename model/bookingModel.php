@@ -13,7 +13,7 @@ class ModelBooking {
         $result = mysqli_query($conn, $sql);
 
         $bookings = [];
-        if ($result->num_rows > 0) {
+        if ($result && $result->num_rows > 0) {
             while ($row = mysqli_fetch_assoc($result)) {
                 $bookings[] = $row;
             }
@@ -72,14 +72,15 @@ class ModelBooking {
                 JOIN client c ON b.id_client = c.id_client
                 JOIN stylist s ON b.id_stylist = s.id_stylist
                 JOIN layanan l ON b.id_layanan = l.id_layanan
-                WHERE c.nama_client LIKE ? OR s.nama_stylist LIKE ? OR l.nama_layanan LIKE ?";
+                WHERE c.nama_client LIKE ? OR s.nama_stylist LIKE ? OR l.nama_layanan LIKE ?
+                ORDER BY b.tanggal DESC, b.waktu DESC";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("sss", $keyword, $keyword, $keyword);
         $stmt->execute();
         $result = $stmt->get_result();
 
         $bookings = [];
-        if ($result->num_rows > 0) {
+        if ($result && $result->num_rows > 0) {
             while ($row = mysqli_fetch_assoc($result)) {
                 $bookings[] = $row;
             }
@@ -87,4 +88,4 @@ class ModelBooking {
         return $bookings;
     }
 }
-?>
+
