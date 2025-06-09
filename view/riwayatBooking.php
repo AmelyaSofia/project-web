@@ -19,6 +19,12 @@ $layananModel = new ModelLayanan();
 $id_client = $_SESSION['id_client'];
 
 $riwayatBookings = $bookingModel->getBookingByClient($id_client);
+foreach ($riwayatBookings as &$booking) {
+    $serviceDetails = $layananModel->getLayananById($booking['id_layanan']);
+    $booking['harga'] = $serviceDetails['harga'] ?? 0;
+    $booking['durasi'] = $serviceDetails['durasi'] ?? 0;
+}
+unset($booking);
 
 $clientData = $clientModel->getClientById($id_client);
 ?>
@@ -360,6 +366,9 @@ $clientData = $clientModel->getClientById($id_client);
                             <div class="card history-card">
                                 <div class="card-header">
                                     <?= htmlspecialchars($booking['nama_layanan']) ?>
+                                    <div class="float-end">
+                                        <span class="badge bg-success">Rp <?= number_format($booking['harga'], 0, ',', '.') ?></span>
+                                    </div>
                                 </div>
                                 <div class="card-body">
                                     <div class="booking-detail">
@@ -386,6 +395,7 @@ $clientData = $clientModel->getClientById($id_client);
                                         </div>
                                         <div>
                                             <strong>Waktu:</strong> <?= htmlspecialchars($booking['waktu']) ?>
+                                            <span class="text-muted">(<?= $booking['durasi'] ?> menit)</span>
                                         </div>
                                     </div>
                                     
