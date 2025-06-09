@@ -21,10 +21,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        if ($clientController->authLogin($username, $password)) {
+        $clientData = $clientController->authLogin($username, $password);
+        if ($clientData) {
+            $_SESSION['role'] = 'client';
+            $_SESSION['username'] = $clientData['username'];
+            $_SESSION['user_name'] = $clientData['nama_client'];
+            $_SESSION['user_id'] = $clientData['id_client'];
+            $_SESSION['id_client'] = $clientData['id_client']; 
             header("Location: ../view/clientDashboard.php");
             exit;
         }
+
 
         $message = "Username atau password salah!";
 

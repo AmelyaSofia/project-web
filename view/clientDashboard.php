@@ -464,7 +464,6 @@ $layanans = mysqli_query($conn, $query);
     </style>
 </head>
 <body>
-    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light sticky-top">
         <div class="container">
             <a class="navbar-brand" href="#">
@@ -488,6 +487,9 @@ $layanans = mysqli_query($conn, $query);
                     <li class="nav-item">
                         <a class="nav-link" href="#contact">Contact</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="riwayatBooking.php"><i class="fas fa-history me-1"></i> Riwayat Booking</a>
+                    </li>
                     <li class="nav-item ms-lg-3">
                         <a class="nav-link" href="logout.php"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
                     </li>
@@ -496,9 +498,7 @@ $layanans = mysqli_query($conn, $query);
         </div>
     </nav>
 
-    <!-- Animated Hero Banner -->
     <div class="hero-banner" id="dashboard">
-        <!-- Slide 1 -->
         <div class="banner-slide active" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('../image/banner.jpg');">
             <div class="banner-content">
                 <h1 class="hero-title">Experience Royal Beauty</h1>
@@ -509,7 +509,6 @@ $layanans = mysqli_query($conn, $query);
             </div>
         </div>
         
-        <!-- Slide 2 -->
         <div class="banner-slide" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('../image/tritmen.jpg');">
             <div class="banner-content">
                 <h1 class="hero-title">Premium Treatments</h1>
@@ -519,8 +518,7 @@ $layanans = mysqli_query($conn, $query);
                 <a href="#services" class="btn btn-royal">Explore Treatments</a>
             </div>
         </div>
-        
-        <!-- Slide 3 -->
+
         <div class="banner-slide" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('../image/layanan/spa.jpg');">
             <div class="banner-content">
                 <h1 class="hero-title">Special Offers</h1>
@@ -530,8 +528,7 @@ $layanans = mysqli_query($conn, $query);
                 <a href="#services" class="btn btn-royal">Claim Offer</a>
             </div>
         </div>
-        
-        <!-- Banner Navigation -->
+
         <div class="banner-nav">
             <div class="banner-nav-btn prev-slide"><i class="fas fa-chevron-left"></i></div>
             <div class="banner-nav-btn next-slide"><i class="fas fa-chevron-right"></i></div>
@@ -544,7 +541,6 @@ $layanans = mysqli_query($conn, $query);
         </div>
     </div>
 
-    <!-- About Section -->
     <section id="about" class="about-section">
         <div class="container">
             <div class="row align-items-center">
@@ -566,7 +562,6 @@ $layanans = mysqli_query($conn, $query);
         </div>
     </section>
 
-    <!-- Services Section -->
     <section id="services" class="services-section">
         <div class="container">
             <h2 class="section-title">Our Signature Services</h2>
@@ -596,11 +591,10 @@ $layanans = mysqli_query($conn, $query);
                 }
                 ?>
             </div>
-            
-            <!-- Hidden Services (will be shown when "View More" is clicked) -->
+
             <div class="row hidden-services" id="moreServices">
                 <?php 
-                $query = "SELECT * FROM layanan LIMIT 3, 6"; // Get next 6 services
+                $query = "SELECT * FROM layanan LIMIT 3, 6";
                 $moreLayanans = mysqli_query($conn, $query);
                 
                 if (mysqli_num_rows($moreLayanans) > 0) {
@@ -630,7 +624,6 @@ $layanans = mysqli_query($conn, $query);
         </div>
     </section>
 
-    <!-- Footer -->
     <footer id="contact">
         <div class="container">
             <div class="row">
@@ -683,7 +676,6 @@ $layanans = mysqli_query($conn, $query);
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     
     <script>
-        // Banner Slider Script
         document.addEventListener('DOMContentLoaded', function() {
             const slides = document.querySelectorAll('.banner-slide');
             const indicators = document.querySelectorAll('.banner-indicator');
@@ -694,11 +686,9 @@ $layanans = mysqli_query($conn, $query);
             let slideInterval;
             
             function showSlide(index) {
-                // Hide all slides
                 slides.forEach(slide => slide.classList.remove('active'));
                 indicators.forEach(indicator => indicator.classList.remove('active'));
-                
-                // Show selected slide
+
                 slides[index].classList.add('active');
                 indicators[index].classList.add('active');
                 currentSlide = index;
@@ -713,32 +703,27 @@ $layanans = mysqli_query($conn, $query);
                 currentSlide = (currentSlide - 1 + slideCount) % slideCount;
                 showSlide(currentSlide);
             }
-            
-            // Auto-rotate slides every 5 seconds
+
             function startSlideInterval() {
                 slideInterval = setInterval(nextSlide, 5000);
             }
             
             startSlideInterval();
-            
-            // Pause on hover
+
             const banner = document.querySelector('.hero-banner');
             banner.addEventListener('mouseenter', () => clearInterval(slideInterval));
             banner.addEventListener('mouseleave', startSlideInterval);
-            
-            // Click indicators to navigate
+
             indicators.forEach(indicator => {
                 indicator.addEventListener('click', function() {
                     const slideIndex = parseInt(this.getAttribute('data-slide'));
                     showSlide(slideIndex);
-                    
-                    // Reset timer when manually navigating
+
                     clearInterval(slideInterval);
                     startSlideInterval();
                 });
             });
-            
-            // Navigation buttons
+
             nextBtn.addEventListener('click', function() {
                 nextSlide();
                 clearInterval(slideInterval);
@@ -750,8 +735,7 @@ $layanans = mysqli_query($conn, $query);
                 clearInterval(slideInterval);
                 startSlideInterval();
             });
-            
-            // View More Services functionality
+
             const viewMoreBtn = document.getElementById('viewMoreBtn');
             if (viewMoreBtn) {
                 viewMoreBtn.addEventListener('click', function() {
@@ -763,15 +747,13 @@ $layanans = mysqli_query($conn, $query);
                         moreServices.style.display = 'none';
                         this.textContent = 'View More Services';
                     }
-                    
-                    // Smooth scroll to maintain position
+
                     setTimeout(() => {
                         this.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                     }, 100);
                 });
             }
-            
-            // Smooth scrolling for anchor links
+
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', function(e) {
                     e.preventDefault();

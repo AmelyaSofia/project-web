@@ -48,10 +48,11 @@ class ControllerClient {
             if ($berhasil) {
                 header("Location: index.php?modul=client&fitur=client&message=Client berhasil ditambahkan");
             } else {
-                header("Location: index.php?modul=clientfitur=tambah&message=Gagal menambahkan client");
+                header("Location: index.php?modul=client&fitur=tambah&message=Gagal menambahkan client");
             }
             exit;
         } else {
+            $clients = $this->model->getClients(); 
             include './view/clientList.php';
         }
     }
@@ -75,9 +76,10 @@ class ControllerClient {
         } else {
             $client = $this->model->getClientById($id_client);
             if (!$client) {
-                header("Location: index.php?modul&client&fitur=client&message=Client tidak ditemukan");
+                header("Location: index.php?modul=client&fitur=client&message=Client tidak ditemukan");
                 exit;
             }
+            $clients = $this->model->getClients();
             include './view/clientList.php';
         }
     }
@@ -104,20 +106,11 @@ class ControllerClient {
 
     public function authLogin($username, $password) {
         $client = $this->model->login($username, $password);
-        if ($client) {
-            $_SESSION['role'] = 'client';
-            $_SESSION['username'] = $client['username'];
-            $_SESSION['user_name'] = $client['nama_client'];
-            $_SESSION['user_id'] = $client['id_client'];
-            header("Location: ../view/clientDashboard.php");
-            exit;
-        }
-        return false;
+        return $client ?: false; 
     }
 
-public function authRegister($data) {
-    return $this->model->register($data);
-}
-
+    public function authRegister($data) {
+        return $this->model->register($data);
+    }
 }
 ?>

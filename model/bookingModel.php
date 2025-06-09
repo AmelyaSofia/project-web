@@ -1,5 +1,5 @@
 <?php
-include './config/dbconnect.php';
+include __DIR__.'/../config/dbconnect.php';
 
 class ModelBooking {
     public function getBookings() {
@@ -87,5 +87,28 @@ class ModelBooking {
         }
         return $bookings;
     }
+
+    public function getBookingByClient($id_client) {
+    global $conn;
+    $sql = "SELECT b.*, c.nama_client, s.nama_stylist, l.nama_layanan
+            FROM booking b
+            JOIN client c ON b.id_client = c.id_client
+            JOIN stylist s ON b.id_stylist = s.id_stylist
+            JOIN layanan l ON b.id_layanan = l.id_layanan
+            WHERE b.id_client = ?
+            ORDER BY b.tanggal DESC, b.waktu DESC";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id_client);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $bookings = [];
+    if ($result && $result->num_rows > 0) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            $bookings[] = $row;
+        }
+    }
+    return $bookings;
 }
 
+}

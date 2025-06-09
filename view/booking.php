@@ -1,50 +1,76 @@
-<?php session_start(); ?>
+<?php
+session_start();
+require_once __DIR__.'/../model/clientModel.php';
+require_once __DIR__.'/../model/stylistModel.php';
+require_once __DIR__.'/../model/layananModel.php';
+require_once __DIR__.'/../controller/bookingController.php';
+
+$controller = new ControllerBooking();
+
+$id_layanan = $_GET['id'] ?? null;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    $id_client = $_SESSION['id_client'] ?? null;
+    $id_stylist = $_POST['id_stylist'];
+    $tanggal = $_POST['tanggal'];
+    $waktu = $_POST['waktu'];
+    $catatan = $_POST['catatan'] ?? '';
+
+    $status = 'menunggu';
+
+    $success = $controller->modelBooking->addBooking($id_client, $id_stylist, $id_layanan, $tanggal, $waktu, $catatan);
+
+    if ($success) {
+        header("Location: booking.php?id=$id_layanan&message=Booking+berhasil+dibuat");
+        exit;
+    } else {
+        header("Location: booking.php?id=$id_layanan&message=Gagal+membuat+booking");
+        exit;
+    }
+}
+
+$stylists = $controller->modelStylist->getStylists();
+$layanan = $controller->modelLayanan->getLayananById($id_layanan);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Form Booking</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"  rel="stylesheet">
+    <title>Booking Layanan</title>
 </head>
 <body>
-<div class="container mt-5">
-    <h2>Booking Layanan</h2>
-    <form action="../index.php?modul=booking&fitur=tambah" method="POST">
-        <!-- Hidden input -->
-        <input type="hidden" name="id_client" value="<?= $_SESSION['id_client'] ?? '' ?>">
-        <input type="hidden" name="id_layanan" value="<?= $_GET['id'] ?>">
+    <h2>Booking Layanan: <?php echo htmlspecialchars($layanan['nama_layanan'] ?? 'Tidak dikenali'); ?></h2>
 
-        <div class="mb-3">
-            <label for="id_stylist" class="form-label">Pilih Stylist</label>
-            <select name="id_stylist" class="form-control" required>
-                <?php
-                include '../model/stylistModel.php';
-                $stylistModel = new ModelStylist();
-                $stylists = $stylistModel->getStylists();
-                foreach ($stylists as $stylist) {
-                    echo "<option value='{$stylist['id_stylist']}'>{$stylist['nama_stylist']}</option>";
-                }
-                ?>
-            </select>
-        </div>
+    <?php if (isset($_GET['message'])): ?>
+        <p style="color: green;"><?php echo htmlspecialchars($_GET['message']); ?></p>
+    <?php endif; ?>
 
-        <div class="mb-3">
-            <label for="tanggal" class="form-label">Tanggal Booking</label>
-            <input type="date" name="tanggal" class="form-control" required>
-        </div>
+    <form method="POST">
+        <label for="id_stylist">Pilih Stylist:</label>
+        <select name="id_stylist" required>
+            <option value="">-- Pilih Stylist --</option>
+            <?php foreach ($stylists as $s): ?>
+                <option value="<?php echo $s['id_stylist']; ?>">
+                    <?php echo htmlspecialchars($s['nama_stylist']); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <br><br>
 
-        <div class="mb-3">
-            <label for="waktu" class="form-label">Waktu Booking</label>
-            <input type="time" name="waktu" class="form-control" required>
-        </div>
+        <label for="tanggal">Tanggal:</label>
+        <input type="date" name="tanggal" required>
+        <br><br>
 
-        <div class="mb-3">
-            <label for="catatan" class="form-label">Catatan Tambahan</label>
-            <textarea name="catatan" class="form-control"></textarea>
-        </div>
+        <label for="waktu">Waktu:</label>
+        <input type="time" name="waktu" required>
+        <br><br>
 
-        <button type="submit" class="btn btn-primary">Simpan Booking</button>
+        <label for="catatan">Catatan Tambahan:</label>
+        <textarea name="catatan"></textarea>
+        <br><br>
+
+        <button type="submit">Submit Booking</button>
     </form>
-</div>
 </body>
 </html>

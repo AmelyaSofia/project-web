@@ -1,14 +1,14 @@
 <?php
-include './model/bookingModel.php';
-include './model/clientModel.php';     
-include './model/stylistModel.php';     
-include './model/layananModel.php';  
+require_once __DIR__.'/../model/bookingModel.php';
+require_once __DIR__.'/../model/clientModel.php';
+require_once __DIR__.'/../model/stylistModel.php';
+require_once __DIR__.'/../model/layananModel.php';
 
 class ControllerBooking {
-    private $modelBooking;
-    private $modelClient;
-    private $modelStylist;
-    private $modelLayanan;
+    public $modelBooking;
+    public $modelClient;
+    public $modelStylist;
+    public $modelLayanan;
 
     public function __construct() {
         $this->modelBooking = new ModelBooking();
@@ -47,6 +47,9 @@ class ControllerBooking {
                     header("Location: index.php?modul=booking&fitur=booking");
                     exit;
                 }
+                break;
+            case 'riwayat_client':
+                $this->riwayatBookingClient();
                 break;
             default:
                 $this->listBookings();
@@ -134,20 +137,34 @@ class ControllerBooking {
         exit;
     }
 
-public function listBookings() {
-    $keyword = $_GET['search'] ?? '';
-    if ($keyword) {
-        $bookings = $this->modelBooking->searchBooking($keyword);
-    } else {
-        $bookings = $this->modelBooking->getBookings();
+    public function listBookings() {
+        $keyword = $_GET['search'] ?? '';
+        if ($keyword) {
+            $bookings = $this->modelBooking->searchBooking($keyword);
+        } else {
+            $bookings = $this->modelBooking->getBookings();
+        }
+        $dropdownData = $this->loadDropdownData();
+        extract($dropdownData);
+
+        include './view/bookingList.php';
     }
 
-    // Load data dropdown supaya $clients, $stylists, $layanans tersedia
-    $dropdownData = $this->loadDropdownData();
-    extract($dropdownData);
+public function riwayatBookingClient() {
+    if(session_status() == PHP_SESSION_NONE) {
+        session_start();
+    }
 
-    include './view/bookingList.php';
+    $id_client = $_SESSION['id_client'] ?? null;
+    if (!$id_client) {
+        echo "Silakan login terlebih dahulu.";
+        exit;
+    }
+    $riwayat = $this->modelBooking->getBookingByClient($id_client);
+
+    include './view/riwayatBooking.php';
 }
+
 
 
 }
