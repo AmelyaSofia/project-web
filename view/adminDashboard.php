@@ -26,16 +26,23 @@ $result_stylist = mysqli_query($conn, $query_stylist);
 $total_stylist = mysqli_fetch_assoc($result_stylist)['total'];
 
 // Booking terbaru
-$query_recent = "SELECT b.*, c.nama_client, s.nama_stylist, l.nama_layanan 
-                 FROM booking b
-                 JOIN client c ON b.id_client = c.id_client
-                 JOIN stylist s ON b.id_stylist = s.id_stylist
-                 JOIN layanan l ON b.id_layanan = l.id_layanan
-                 ORDER BY b.tanggal DESC, b.waktu DESC LIMIT 5";
+// Booking terbaru
+$query_recent = "SELECT b.*, c.nama_client, s.nama_stylist, 
+    GROUP_CONCAT(l.nama_layanan SEPARATOR ', ') AS nama_layanan
+    FROM booking b
+    JOIN client c ON b.id_client = c.id_client
+    JOIN stylist s ON b.id_stylist = s.id_stylist
+    JOIN booking_layanan bl ON b.id_booking = bl.id_booking
+    JOIN layanan l ON bl.id_layanan = l.id_layanan
+    GROUP BY b.id_booking
+    ORDER BY b.tanggal DESC, b.waktu DESC
+    LIMIT 5
+";
+
 $result_recent = mysqli_query($conn, $query_recent);
 $recent_bookings = mysqli_fetch_all($result_recent, MYSQLI_ASSOC);
-
 ?>
+
 
 <!DOCTYPE html>
 <html lang="id">

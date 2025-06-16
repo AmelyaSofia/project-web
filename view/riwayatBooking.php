@@ -19,14 +19,24 @@ $layananModel = new ModelLayanan();
 $id_client = $_SESSION['id_client'];
 
 $riwayatBookings = $bookingModel->getBookingByClient($id_client);
+$clientData = $clientModel->getClientById($id_client);
+
+// Loop untuk menambahkan detail layanan dan stylist
 foreach ($riwayatBookings as &$booking) {
-    $serviceDetails = $layananModel->getLayananById($booking['id_layanan']);
-    $booking['harga'] = $serviceDetails['harga'] ?? 0;
-    $booking['durasi'] = $serviceDetails['durasi'] ?? 0;
+    // Ambil detail stylist
+    $stylist = $stylistModel->getStylistById($booking['id_stylist']);
+    $booking['nama_stylist'] = $stylist['nama_stylist'] ?? 'Tidak Diketahui';
+
+    // Ambil semua layanan terkait booking (jika kamu mendukung banyak layanan per booking)
+    $layanan_list = $bookingModel->getLayananByBooking($booking['id_booking']); // misal kamu punya relasi tabel booking_layanan
+    
+    $booking['layanan_list'] = $layanan_list ?: [];
+
+    // Hitung total harga & durasi
+    $booking['total_harga'] = array_sum(array_column($layanan_list, 'harga'));
+    $booking['total_durasi'] = array_sum(array_column($layanan_list, 'durasi'));
 }
 unset($booking);
-
-$clientData = $clientModel->getClientById($id_client);
 ?>
 
 <!DOCTYPE html>
@@ -360,81 +370,86 @@ $clientData = $clientModel->getClientById($id_client);
             <?php endif; ?>
 
             <?php if (!empty($riwayatBookings)): ?>
-                <div class="row">
-                    <?php foreach ($riwayatBookings as $booking): ?>
-                        <div class="col-md-6 col-lg-4">
-                            <div class="card history-card">
-                                <div class="card-header">
-                                    <?= htmlspecialchars($booking['nama_layanan']) ?>
-                                    <div class="float-end">
-                                        <span class="badge bg-success">Rp <?= number_format($booking['harga'], 0, ',', '.') ?></span>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="booking-detail">
-                                        <div class="booking-icon">
-                                            <i class="fas fa-user"></i>
-                                        </div>
-                                        <div>
-                                            <strong>Stylist:</strong> <?= htmlspecialchars($booking['nama_stylist']) ?>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="booking-detail">
-                                        <div class="booking-icon">
-                                            <i class="far fa-calendar-alt"></i>
-                                        </div>
-                                        <div>
-                                            <strong>Tanggal:</strong> <?= date('d M Y', strtotime($booking['tanggal'])) ?>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="booking-detail">
-                                        <div class="booking-icon">
-                                            <i class="far fa-clock"></i>
-                                        </div>
-                                        <div>
-                                            <strong>Waktu:</strong> <?= htmlspecialchars($booking['waktu']) ?>
-                                            <span class="text-muted">(<?= $booking['durasi'] ?> menit)</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="booking-detail">
-                                        <div class="booking-icon">
-                                            <i class="fas fa-info-circle"></i>
-                                        </div>
-                                        <div>
-                                            <strong>Status:</strong> 
-                                            <span class="status-badge 
-                                                <?= $booking['status'] == 'menunggu' ? 'status-menunggu' : 
-                                                   ($booking['status'] == 'diterima' ? 'status-diterima' : 
-                                                   ($booking['status'] == 'selesai' ? 'status-selesai' : 'status-ditolak')) ?>">
-                                                <?= ucfirst(htmlspecialchars($booking['status'])) ?>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="booking-detail">
-                                        <div class="booking-icon">
-                                            <i class="fas fa-comment"></i>
-                                        </div>
-                                        <div>
-                                            <strong>Catatan:</strong> <?= htmlspecialchars($booking['catatan'] ?: '-') ?>
-                                        </div>
-                                    </div>
-                                </div>
+    <div class="row">
+        <?php foreach ($riwayatBookings as $booking): ?>
+            <div class="col-md-6 col-lg-4">
+                <div class="card history-card">
+                    <div class="card-header">
+                        <strong>Layanan:</strong>
+                        <ul class="mb-0 ps-3">
+                            <?php foreach ($booking['layanan_list'] as $l): ?>
+                                <li><?= htmlspecialchars($l['nama_layanan']) ?> - Rp <?= number_format($l['harga'], 0, ',', '.') ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                        <div class="float-end mt-2">
+                            <span class="badge bg-success">Total: Rp <?= number_format($booking['total_harga'], 0, ',', '.') ?></span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="booking-detail">
+                            <div class="booking-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div>
+                                <strong>Stylist:</strong> <?= htmlspecialchars($booking['nama_stylist']) ?>
                             </div>
                         </div>
-                    <?php endforeach; ?>
+
+                        <div class="booking-detail">
+                            <div class="booking-icon">
+                                <i class="far fa-calendar-alt"></i>
+                            </div>
+                            <div>
+                                <strong>Tanggal:</strong> <?= date('d M Y', strtotime($booking['tanggal'])) ?>
+                            </div>
+                        </div>
+
+                        <div class="booking-detail">
+                            <div class="booking-icon">
+                                <i class="far fa-clock"></i>
+                            </div>
+                            <div>
+                                <strong>Waktu:</strong> <?= htmlspecialchars($booking['waktu']) ?>
+                                <span class="text-muted">(<?= $booking['total_durasi'] ?> menit)</span>
+                            </div>
+                        </div>
+
+                        <div class="booking-detail">
+                            <div class="booking-icon">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div>
+                                <strong>Status:</strong> 
+                                <span class="status-badge 
+                                    <?= $booking['status'] == 'menunggu' ? 'status-menunggu' : 
+                                       ($booking['status'] == 'diterima' ? 'status-diterima' : 
+                                       ($booking['status'] == 'selesai' ? 'status-selesai' : 'status-ditolak')) ?>">
+                                    <?= ucfirst(htmlspecialchars($booking['status'])) ?>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="booking-detail">
+                            <div class="booking-icon">
+                                <i class="fas fa-comment"></i>
+                            </div>
+                            <div>
+                                <strong>Catatan:</strong> <?= htmlspecialchars($booking['catatan'] ?: '-') ?>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            <?php else: ?>
-                <div class="no-history">
-                    <i class="fas fa-calendar-times"></i>
-                    <h3>Belum Ada Riwayat Booking</h3>
-                    <p>Anda belum memiliki riwayat booking. Silakan booking layanan kami terlebih dahulu.</p>
-                    <a href="clientDashboard.php#services" class="btn btn-primary">Lihat Layanan</a>
-                </div>
-            <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
+    </div>
+<?php else: ?>
+    <div class="no-history">
+        <i class="fas fa-calendar-times"></i>
+        <h3>Belum Ada Riwayat Booking</h3>
+        <p>Anda belum memiliki riwayat booking. Silakan booking layanan kami terlebih dahulu.</p>
+        <a href="clientDashboard.php#services" class="btn btn-primary">Lihat Layanan</a>
+    </div>
+<?php endif; ?>
         </div>
     </section>
 

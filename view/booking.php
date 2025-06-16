@@ -1,6 +1,7 @@
 <?php
 session_start();
-require_once __DIR__.'/../model/clientModel.php';
+
+require_once __DIR__.'/../model/bookingModel.php';
 require_once __DIR__.'/../model/stylistModel.php';
 require_once __DIR__.'/../model/layananModel.php';
 require_once __DIR__.'/../controller/bookingController.php';
@@ -9,6 +10,20 @@ $controller = new ControllerBooking();
 
 $id_layanan = $_GET['id'] ?? null;
 
+// Ambil semua layanan untuk checkbox
+$layanan = $controller->modelLayanan->getLayanans(); // Pastikan method ini ada
+
+// Ambil layanan yang diklik untuk bagian "Layanan yang dipilih"
+$layanan_dipilih = [];
+if ($id_layanan) {
+    $layanan_terpilih = $controller->modelLayanan->getLayananById($id_layanan);
+    if ($layanan_terpilih) {
+        $layanan_dipilih[] = $layanan_terpilih;
+    }
+}
+
+$stylists = $controller->modelStylist->getStylists();
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id_client = $_SESSION['id_client'] ?? null;
     $id_stylist = $_POST['id_stylist'];
@@ -16,9 +31,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $waktu = $_POST['waktu'];
     $catatan = $_POST['catatan'] ?? '';
 
-    $status = 'menunggu';
+    // Ambil layanan dari checkbox
+    $layanan_list = isset($_POST['id_layanan']) ? (array)$_POST['id_layanan'] : [];
 
-    $success = $controller->modelBooking->addBooking($id_client, $id_stylist, $id_layanan, $tanggal, $waktu, $catatan, $status);
+    if (empty($layanan_list)) {
+        header("Location: booking.php?id=$id_layanan&message=Harap+pilih+minimal+satu+layanan");
+        exit;
+    }
+
+    $success = $controller->modelBooking->addBooking(
+        $id_client,
+        $id_stylist,
+        $tanggal,
+        $waktu,
+        $catatan,
+        $layanan_list
+    );
 
     if ($success) {
         header("Location: riwayatBooking.php?message=Booking+berhasil+dibuat");
@@ -29,8 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$stylists = $controller->modelStylist->getStylists();
-$layanan = $controller->modelLayanan->getLayananById($id_layanan);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -358,66 +384,92 @@ $layanan = $controller->modelLayanan->getLayananById($id_layanan);
     </nav>
 
     <section class="booking-container">
-        <div class="container">
-            <div class="booking-card">
-                <div class="booking-header">
-                    <h2>Booking Layanan</h2>
-                </div>
-                <div class="booking-body">
-                    <?php if (isset($_GET['message'])): ?>
-                        <div class="alert alert-<?= strpos($_GET['message'], 'berhasil') !== false ? 'success' : 'danger' ?>">
-                            <?= htmlspecialchars($_GET['message']) ?>
-                        </div>
-                    <?php endif; ?>
+    <div class="container">
+        <div class="booking-card">
+            <div class="booking-header">
+                <h2>Booking Layanan</h2>
+            </div>
+            <div class="booking-body">
+                <?php if (isset($_GET['message'])): ?>
+                    <div class="alert alert-<?= strpos($_GET['message'], 'berhasil') !== false ? 'success' : 'danger' ?>">
+                        <?= htmlspecialchars($_GET['message']) ?>
+                    </div>
+                <?php endif; ?>
 
-                    <!-- <div class="service-info">
-                        <h5>Layanan yang dipilih:</h5>
-                        <p class="mb-0"><?= htmlspecialchars($layanan['nama_layanan'] ?? 'Tidak dikenali') ?></p>
-                    </div> -->
-                    <div class="service-info">
-                        <h5>Layanan yang dipilih:</h5>
-                        <p class="mb-1"><strong><?= htmlspecialchars($layanan['nama_layanan'] ?? 'Tidak ditemukan') ?></strong></p>
-                        <p class="mb-0">Harga: Rp <?= number_format($layanan['harga'] ?? 0, 0, ',', '.') ?></p>
+                <!-- Menampilkan layanan yang dipilih -->
+<div class="service-info mb-3">
+    <h5>Layanan yang dipilih:</h5>
+    <?php if (!empty($layanan_dipilih)): ?>
+        <ul class="mb-1">
+            <?php foreach ($layanan_dipilih as $l): ?>
+                <li>
+                    <strong><?= htmlspecialchars($l['nama_layanan']) ?></strong>
+                    - Rp <?= number_format($l['harga'], 0, ',', '.') ?>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    <?php else: ?>
+        <p class="mb-0">Tidak ada layanan yang dipilih.</p>
+    <?php endif; ?>
+</div>
+
+<!-- Form Booking -->
+<form method="POST">
+    <div class="mb-3">
+        <label class="form-label">Pilih Layanan</label>
+        <?php foreach ($layanan as $l): ?>
+            <?php
+                // Cek apakah layanan ini yang diklik di awal
+                $checked = ($id_layanan == $l['id_layanan']) ? 'checked' : '';
+            ?>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="id_layanan[]" value="<?= $l['id_layanan'] ?>" id="layanan<?= $l['id_layanan'] ?>" <?= $checked ?>>
+                <label class="form-check-label" for="layanan<?= $l['id_layanan'] ?>">
+                    <?= htmlspecialchars($l['nama_layanan']) ?> - Rp <?= number_format($l['harga'], 0, ',', '.') ?>
+                </label>
+            </div>
+        <?php endforeach; ?>
+    </div>
+
+
+                    <div class="mb-3">
+                        <label for="id_stylist" class="form-label">Pilih Stylist</label>
+                        <select name="id_stylist" class="form-select" required>
+                            <option value="">-- Pilih Stylist --</option>
+                            <?php foreach ($stylists as $s): ?>
+                                <option value="<?= $s['id_stylist'] ?>">
+                                    <?= htmlspecialchars($s['nama_stylist']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
 
-                    <form method="POST">
-                        <div class="mb-3">
-                            <label for="id_stylist" class="form-label">Pilih Stylist</label>
-                            <select name="id_stylist" class="form-select" required>
-                                <option value="">-- Pilih Stylist --</option>
-                                <?php foreach ($stylists as $s): ?>
-                                    <option value="<?= $s['id_stylist'] ?>">
-                                        <?= htmlspecialchars($s['nama_stylist']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="tanggal" class="form-label">Tanggal</label>
+                            <input type="date" name="tanggal" class="form-control" required>
                         </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="waktu" class="form-label">Waktu</label>
+                            <input type="time" name="waktu" class="form-control" required>
+                        </div>
+                    </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="tanggal" class="form-label">Tanggal</label>
-                                <input type="date" name="tanggal" class="form-control" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="waktu" class="form-label">Waktu</label>
-                                <input type="time" name="waktu" class="form-control" required>
-                            </div>
-                        </div>
+                    <div class="mb-3">
+                        <label for="catatan" class="form-label">Catatan Tambahan</label>
+                        <textarea name="catatan" class="form-control" rows="3"></textarea>
+                    </div>
 
-                        <div class="mb-3">
-                            <label for="catatan" class="form-label">Catatan Tambahan</label>
-                            <textarea name="catatan" class="form-control" rows="3"></textarea>
-                        </div>
-
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a href="clientDashboard.php#services" class="btn btn-outline-secondary me-md-2">Kembali</a>
-                            <button type="submit" class="btn btn-primary">Submit Booking</button>
-                        </div>
-                    </form>
-                </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="clientDashboard.php#services" class="btn btn-outline-secondary me-md-2">Kembali</a>
+                        <button type="submit" class="btn btn-primary">Submit Booking</button>
+                    </div>
+                </form>
             </div>
         </div>
-    </section>
+    </div>
+</section>
+
 
     <footer id="contact">
         <div class="container">

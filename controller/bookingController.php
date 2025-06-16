@@ -68,12 +68,17 @@ class ControllerBooking {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id_client = $_POST['id_client'];
             $id_stylist = $_POST['id_stylist'];
-            $id_layanan = $_POST['id_layanan'];
             $tanggal = $_POST['tanggal'];
             $waktu = $_POST['waktu'];
             $catatan = $_POST['catatan'] ?? '';
+            $layanan_list = $_POST['id_layanan'] ?? [];
 
-            $success = $this->modelBooking->addBooking($id_client, $id_stylist, $id_layanan, $tanggal, $waktu, $catatan);
+            if (empty($layanan_list)) {
+                header("Location: index.php?modul=booking&fitur=tambah&message=Harap pilih minimal satu layanan");
+                exit;
+            }
+
+            $success = $this->modelBooking->addBooking($id_client, $id_stylist, $tanggal, $waktu, $catatan, $layanan_list);
             if ($success) {
                 header("Location: index.php?modul=booking&fitur=booking&message=Booking berhasil ditambahkan");
             } else {
@@ -92,13 +97,18 @@ class ControllerBooking {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id_client = $_POST['id_client'];
             $id_stylist = $_POST['id_stylist'];
-            $id_layanan = $_POST['id_layanan'];
             $tanggal = $_POST['tanggal'];
             $waktu = $_POST['waktu'];
             $status = $_POST['status'];
             $catatan = $_POST['catatan'] ?? '';
+            $layanan_list = $_POST['id_layanan'] ?? [];
 
-            $success = $this->modelBooking->updateBooking($id_booking, $id_client, $id_stylist, $id_layanan, $tanggal, $waktu, $status, $catatan);
+            if (empty($layanan_list)) {
+                header("Location: index.php?modul=booking&fitur=update&id_booking=$id_booking&message=Harap pilih minimal satu layanan");
+                exit;
+            }
+
+            $success = $this->modelBooking->updateBooking($id_booking, $id_client, $id_stylist, $tanggal, $waktu, $status, $catatan, $layanan_list);
             if ($success) {
                 header("Location: index.php?modul=booking&fitur=booking&message=Booking berhasil diupdate");
             } else {
@@ -111,8 +121,12 @@ class ControllerBooking {
                 header("Location: index.php?modul=booking&fitur=booking&message=Booking tidak ditemukan");
                 exit;
             }
+
+            $layananTerpilih = $this->modelBooking->getLayananByBooking($id_booking);
+
             $dropdownData = $this->loadDropdownData();
             extract($dropdownData);
+
             include './view/bookingList.php';
         }
     }
@@ -144,28 +158,26 @@ class ControllerBooking {
         } else {
             $bookings = $this->modelBooking->getBookings();
         }
+
         $dropdownData = $this->loadDropdownData();
         extract($dropdownData);
 
         include './view/bookingList.php';
     }
 
-public function riwayatBookingClient() {
-    if(session_status() == PHP_SESSION_NONE) {
-        session_start();
+    public function riwayatBookingClient() {
+        if(session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $id_client = $_SESSION['id_client'] ?? null;
+        if (!$id_client) {
+            echo "Silakan login terlebih dahulu.";
+            exit;
+        }
+        $riwayat = $this->modelBooking->getBookingByClient($id_client);
+
+        include './view/riwayatBooking.php';
     }
-
-    $id_client = $_SESSION['id_client'] ?? null;
-    if (!$id_client) {
-        echo "Silakan login terlebih dahulu.";
-        exit;
-    }
-    $riwayat = $this->modelBooking->getBookingByClient($id_client);
-
-    include './view/riwayatBooking.php';
-}
-
-
-
 }
 ?>

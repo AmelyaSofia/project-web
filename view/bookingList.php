@@ -59,20 +59,17 @@
 
                 <!-- Layanan -->
                 <div>
-                    <label class="block font-medium">Layanan:</label>
-                    <select name="id_layanan" class="w-full p-2 border border-gray-300 rounded-lg" required>
-                        <option value="">-- Pilih Layanan --</option>
-                        <?php foreach ($layanans as $layanan): ?>
-                            <option value="<?php echo $layanan['id_layanan']; ?>" 
-                                <?php 
-                                    if (isset($booking) && $booking['id_layanan'] == $layanan['id_layanan']) echo 'selected'; 
-                                    elseif (!isset($booking) && isset($_POST['id_layanan']) && $_POST['id_layanan'] == $layanan['id_layanan']) echo 'selected';
-                                ?>>
-                                <?php echo htmlspecialchars($layanan['nama_layanan']); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+    <label class="block font-medium">Layanan:</label>
+    <?php foreach ($layanans as $layanan): ?>
+        <label class="block">
+            <input type="checkbox" name="id_layanan[]" value="<?php echo $layanan['id_layanan']; ?>"
+                <?php 
+                    if (isset($_POST['id_layanan']) && in_array($layanan['id_layanan'], $_POST['id_layanan'])) echo 'checked';
+                ?>>
+            <?php echo htmlspecialchars($layanan['nama_layanan']); ?>
+        </label>
+    <?php endforeach; ?>
+</div>
 
                 <!-- Tanggal dan Waktu -->
                 <div class="grid grid-cols-2 gap-4">
@@ -135,19 +132,6 @@
         <!-- Table -->
         <div class="overflow-x-auto">
             <table class="w-full border text-sm text-left bg-white shadow-md rounded-xl">
-                <!-- <thead class="bg-[#967E76] text-white">
-                    <tr>
-                        <th class="p-3">ID</th>
-                        <th class="p-3">Client</th>
-                        <th class="p-3">Stylist</th>
-                        <th class="p-3">Layanan</th>
-                        <th class="p-3">Tanggal</th>
-                        <th class="p-3">Waktu</th>
-                        <th class="p-3">Status</th>
-                        <th class="p-3">Catatan</th>
-                        <th class="p-3">Aksi</th>
-                    </tr>
-                </thead> -->
                 <thead class="bg-[#967E76] text-white">
                     <tr>
                         <th class="p-3">ID</th>
