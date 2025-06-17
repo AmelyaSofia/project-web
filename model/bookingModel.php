@@ -53,30 +53,34 @@ class ModelBooking {
         return $booking;
     }
 
-    public function addBooking($id_client, $id_stylist, $tanggal, $waktu, $catatan, $layanan_list) {
-        global $conn;
+public function addBooking($id_client, $id_stylist, $tanggal, $waktu, $catatan, $layanan_list) {
+    global $conn;
 
-        $sql = "INSERT INTO booking (id_client, id_stylist, tanggal, waktu, status, catatan) 
-                VALUES (?, ?, ?, ?, 'menunggu', ?)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("iisss", $id_client, $id_stylist, $tanggal, $waktu, $catatan);
+    // Insert ke tabel booking
+    $sql = "INSERT INTO booking (id_client, id_stylist, tanggal, waktu, status, catatan) 
+            VALUES (?, ?, ?, ?, 'menunggu', ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("iisss", $id_client, $id_stylist, $tanggal, $waktu, $catatan);
 
-        if (!$stmt->execute()) {
-            return false;
-        }
-
-        $id_booking = $conn->insert_id;
-
-        $sqlLayanan = "INSERT INTO booking_layanan (id_booking, id_layanan) VALUES (?, ?)";
-        $stmtLayanan = $conn->prepare($sqlLayanan);
-
-        foreach ($layanan_list as $id_layanan) {
-            $stmtLayanan->bind_param("ii", $id_booking, $id_layanan);
-            $stmtLayanan->execute();
-        }
-
-        return true;
+    if (!$stmt->execute()) {
+        return false;
     }
+
+    // Ambil ID booking yang baru saja dibuat
+    $id_booking = $conn->insert_id;
+
+    // Simpan layanan yang dipilih ke tabel booking_layanan
+    $sqlLayanan = "INSERT INTO booking_layanan (id_booking, id_layanan) VALUES (?, ?)";
+    $stmtLayanan = $conn->prepare($sqlLayanan);
+
+    foreach ($layanan_list as $id_layanan) {
+        $stmtLayanan->bind_param("ii", $id_booking, $id_layanan);
+        $stmtLayanan->execute();
+    }
+
+    // Kembalikan ID booking agar bisa digunakan untuk redirect ke pembayaran
+    return $id_booking;
+}
 
     public function updateBooking($id_booking, $id_client, $id_stylist, $tanggal, $waktu, $status, $catatan, $layanan_list) {
         global $conn;
@@ -199,4 +203,20 @@ class ModelBooking {
 
         return $layanans;
     }
+    public function hitungTotalHarga($id_booking) {
+    global $conn;
+
+    // Hitung total harga dari semua layanan dalam booking ini
+    $sql = "SELECT SUM(l.harga) AS total 
+            FROM booking_layanan bl
+            JOIN layanan l ON bl.id_layanan = l.id_layanan
+            WHERE bl.id_booking = ?";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id_booking);
+    $stmt->execute();
+    $result = $stmt->get_result()->fetch_assoc();
+
+    return $result['total'] ?: 0;
+}
 }

@@ -7,14 +7,16 @@ if (!isset($_SESSION['id_client'])) {
 }
 
 require_once __DIR__ . '/../model/bookingModel.php';
-require_once __DIR__ . '/../model/clientModel.php';
-require_once __DIR__ . '/../model/stylistModel.php';
-require_once __DIR__ . '/../model/layananModel.php';
+require_once __DIR__  . '/../model/clientModel.php';
+require_once __DIR__  . '/../model/stylistModel.php';
+require_once __DIR__  . '/../model/layananModel.php';
+require_once __DIR__  . '/../model/pembayaranModel.php';
 
 $bookingModel = new ModelBooking();
 $clientModel = new ModelClient();
 $stylistModel = new ModelStylist();
 $layananModel = new ModelLayanan();
+$pembayaranModel = new ModelPembayaran();
 
 $id_client = $_SESSION['id_client'];
 
@@ -23,18 +25,19 @@ $clientData = $clientModel->getClientById($id_client);
 
 // Loop untuk menambahkan detail layanan dan stylist
 foreach ($riwayatBookings as &$booking) {
-    // Ambil detail stylist
     $stylist = $stylistModel->getStylistById($booking['id_stylist']);
     $booking['nama_stylist'] = $stylist['nama_stylist'] ?? 'Tidak Diketahui';
 
-    // Ambil semua layanan terkait booking (jika kamu mendukung banyak layanan per booking)
-    $layanan_list = $bookingModel->getLayananByBooking($booking['id_booking']); // misal kamu punya relasi tabel booking_layanan
-    
+    $layanan_list = $bookingModel->getLayananByBooking($booking['id_booking']);
     $booking['layanan_list'] = $layanan_list ?: [];
 
-    // Hitung total harga & durasi
     $booking['total_harga'] = array_sum(array_column($layanan_list, 'harga'));
     $booking['total_durasi'] = array_sum(array_column($layanan_list, 'durasi'));
+
+    // Cek status DP
+    $pembayaran = $pembayaranModel->cekDPTelahDibayar($booking['id_booking']);
+    $booking['dp_dibayar'] = $pembayaran ? true : false;
+    $booking['bukti_pembayaran'] = $pembayaran['bukti_pembayaran'] ?? null;
 }
 unset($booking);
 ?>
@@ -437,6 +440,35 @@ unset($booking);
                                 <strong>Catatan:</strong> <?= htmlspecialchars($booking['catatan'] ?: '-') ?>
                             </div>
                         </div>
+
+<div class="booking-detail">
+    <div class="booking-icon">
+        <i class="fas fa-money-check-alt"></i>
+    </div>
+    <div>
+        <strong>Status DP:</strong>
+        <?php if ($booking['dp_dibayar']): ?>
+            <span class="status-badge" style="background-color: #D4EDDA; color: #155724;">Sudah Dibayar</span>
+            <br>
+            <a href="<?= htmlspecialchars($booking['bukti_pembayaran']) ?>" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
+                <i class="fas fa-file-image me-1"></i>Lihat Bukti
+            </a>
+        <?php elseif (!empty($booking['bukti_pembayaran'])): ?>
+            <span class="status-badge" style="background-color: #F8D7DA; color: #721C24;">Pembayaran Ditolak</span>
+            <br>
+            <a href="pembayaran.php?id=<?= $booking['id_booking'] ?>" class="btn btn-sm btn-warning mt-2">
+                <i class="fas fa-redo me-1"></i>Upload Ulang Bukti
+            </a>
+        <?php else: ?>
+            <span class="status-badge" style="background-color: #FFF3CD; color: #856404;">Belum Bayar DP</span>
+            <br>
+            <a href="pembayaran.php?id=<?= $booking['id_booking'] ?>" class="btn btn-sm btn-primary mt-2">
+                <i class="fas fa-wallet me-1"></i>Bayar DP Sekarang
+            </a>
+        <?php endif; ?>
+    </div>
+</div>
+
                     </div>
                 </div>
             </div>

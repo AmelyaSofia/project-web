@@ -24,25 +24,36 @@ switch ($modul) {
         $controllerClient = new ControllerClient();
         $controllerClient->handleRequest($fitur);
         break;
+
     case 'layanan':
         include './controller/layananController.php';
         $controllerLayanan = new ControllerLayanan();
         $controllerLayanan->handleRequest($fitur);
         break;
+
     case 'stylist':
         include './controller/stylistController.php';
         $controllerStylist = new ControllerStylist();
         $controllerStylist->handleRequest($fitur);
         break;
+
     case 'booking':
         include './controller/bookingController.php';
         $controllerBooking = new ControllerBooking();
         $controllerBooking->handleRequest($fitur);
         break;
+
+    case 'pembayaran': 
+        include './controller/pembayaranController.php';
+        $controllerPembayaran = new ControllerPembayaran();
+        $controllerPembayaran->handleRequest($fitur);
+        break;
+
     default:
         header('Location: ./view/adminDashboard.php');
         exit;
 }
+
 
 // $modul = $_GET['modul'] ?? 'booking';
 // $fitur = $_GET['fitur'] ?? 'list';

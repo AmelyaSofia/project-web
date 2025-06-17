@@ -50,6 +50,14 @@
       Booking
     </a>
 
+    <a href="/project web/index.php?modul=pembayaran&fitur=list" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-[#D7C0AE] transition">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+        viewBox="0 0 24 24">
+        <path d="M12 8c-1.1 0-2 .9-2 2v4H8v2h4v-2h2v-2h-2v-2h2v-2h-2z"/>
+      </svg>
+      Pembayaran
+    </a>
+
     <a href="logout.php" class="flex items-center gap-3 px-4 py-2 mt-6 rounded-lg bg-red-500 hover:bg-red-600 transition">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
         viewBox="0 0 24 24">
