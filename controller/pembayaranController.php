@@ -14,11 +14,13 @@ class ControllerPembayaran {
     public function handleRequest($fitur) {
         switch ($fitur) {
 
+            // ✅ Admin melihat semua pembayaran
             case 'list':
                 $pembayarans = $this->model->getAllPembayaran();
                 include __DIR__ . '/../view/pembayaranList.php';
                 break;
 
+            // ✅ Admin melakukan verifikasi pembayaran
             case 'verifikasi':
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['id']) && isset($_POST['aksi'])) {
                     $id_pembayaran = $_GET['id'];
@@ -28,13 +30,6 @@ class ControllerPembayaran {
 
                     $hasil = $this->model->verifikasiPembayaran($id_pembayaran, $status, $alasan);
 
-                    if ($hasil && $status === 'dibayar') {
-                        $pembayaran = $this->model->getPembayaranById($id_pembayaran);
-                        if ($pembayaran['jenis'] === 'pelunasan') {
-                            $this->bookingModel->updateStatus($pembayaran['id_booking'], 'terjadwal');
-                        }
-                    }
-
                     $pesan = $hasil ? 'Verifikasi berhasil' : 'Verifikasi gagal';
                     header("Location: index.php?modul=pembayaran&fitur=list&message=" . urlencode($pesan));
                     exit();
@@ -43,29 +38,40 @@ class ControllerPembayaran {
                 }
                 break;
 
+            // ✅ Client mengupload bukti pembayaran (DP atau pelunasan)
             case 'upload':
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_pembayaran'])) {
-                    $id_booking = $_POST['id_booking'];
-                    $jenis = $_POST['jenis'];
+                    $id_booking = intval($_POST['id_booking']);
+                    $jenis = $_POST['jenis']; // dp / pelunasan
                     $jumlah = $_POST['jumlah'];
+                    $metode_pembayaran = $_POST['metode'];
 
                     $fileName = null;
                     if (!empty($_FILES['bukti']['name'])) {
                         $uploadDir = __DIR__ . '/../uploads/';
+                        if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
                         $fileName = time() . '_' . basename($_FILES['bukti']['name']);
                         $destination = $uploadDir . $fileName;
 
+                        $allowed_ext = ['jpg', 'jpeg', 'png', 'gif'];
+                        $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+                        if (!in_array($ext, $allowed_ext)) {
+                            header("Location: ../view/riwayatBooking.php?status=gagal_format");
+                            exit();
+                        }
+
                         if (!move_uploaded_file($_FILES['bukti']['tmp_name'], $destination)) {
-                            die('Upload file gagal. Pastikan folder uploads dapat ditulisi.');
+                            header("Location: ../view/riwayatBooking.php?status=gagal_upload");
+                            exit();
                         }
                     }
 
-                    $sukses = $this->model->simpanPembayaran($id_booking, $jenis, $jumlah, $fileName);
+                    $sukses = $this->model->simpanPembayaran($id_booking, $jenis, $jumlah, $fileName, $metode_pembayaran);
 
                     if ($sukses) {
                         header("Location: ../view/riwayatBooking.php?status=berhasil");
                     } else {
-                        header("Location: ../view/riwayatBooking.php?status=gagal");
+                        header("Location: ../view/riwayatBooking.php?status=gagal_simpan");
                     }
                     exit();
                 } else {

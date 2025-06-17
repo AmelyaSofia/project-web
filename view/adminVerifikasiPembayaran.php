@@ -29,9 +29,9 @@ $pembayaran = $pembayaranModel->getAllPembayaran();
                 Tidak ada
             <?php endif; ?>
         </td>
-        <td><?= ucfirst($row['status']) ?></td>
+        <td><?= ucfirst($row['status_pembayaran']) ?></td>
         <td>
-            <?php if ($row['status'] == 'pending'): ?>
+            <?php if ($row['status_pembayaran'] === 'pending'): ?>
                 <form action="../index.php?modul=pembayaran&fitur=verifikasi&id=<?= $row['id_pembayaran'] ?>" method="POST">
                     <select name="aksi" required>
                         <option value="">Pilih</option>

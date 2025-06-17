@@ -34,10 +34,14 @@ foreach ($riwayatBookings as &$booking) {
     $booking['total_harga'] = array_sum(array_column($layanan_list, 'harga'));
     $booking['total_durasi'] = array_sum(array_column($layanan_list, 'durasi'));
 
-    // Cek status DP
     $pembayaran = $pembayaranModel->cekDPTelahDibayar($booking['id_booking']);
-    $booking['dp_dibayar'] = $pembayaran ? true : false;
-    $booking['bukti_pembayaran'] = $pembayaran['bukti_pembayaran'] ?? null;
+    if ($pembayaran) {
+        $booking['pembayaran_dp_status'] = $pembayaran['status_pembayaran']; 
+        $booking['bukti_pembayaran'] = $pembayaran['bukti_pembayaran'];
+    } else {
+        $booking['pembayaran_dp_status'] = 'belum';
+        $booking['bukti_pembayaran'] = null;
+    }
 }
 unset($booking);
 ?>
@@ -447,25 +451,34 @@ unset($booking);
     </div>
     <div>
         <strong>Status DP:</strong>
-        <?php if ($booking['dp_dibayar']): ?>
-            <span class="status-badge" style="background-color: #D4EDDA; color: #155724;">Sudah Dibayar</span>
-            <br>
-            <a href="<?= htmlspecialchars($booking['bukti_pembayaran']) ?>" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
-                <i class="fas fa-file-image me-1"></i>Lihat Bukti
-            </a>
-        <?php elseif (!empty($booking['bukti_pembayaran'])): ?>
-            <span class="status-badge" style="background-color: #F8D7DA; color: #721C24;">Pembayaran Ditolak</span>
-            <br>
-            <a href="pembayaran.php?id=<?= $booking['id_booking'] ?>" class="btn btn-sm btn-warning mt-2">
-                <i class="fas fa-redo me-1"></i>Upload Ulang Bukti
-            </a>
-        <?php else: ?>
-            <span class="status-badge" style="background-color: #FFF3CD; color: #856404;">Belum Bayar DP</span>
-            <br>
-            <a href="pembayaran.php?id=<?= $booking['id_booking'] ?>" class="btn btn-sm btn-primary mt-2">
-                <i class="fas fa-wallet me-1"></i>Bayar DP Sekarang
-            </a>
-        <?php endif; ?>
+<?php if ($booking['pembayaran_dp_status'] === 'dibayar'): ?>
+    <span class="status-badge" style="background-color: #D4EDDA; color: #155724;">Sudah Dibayar</span>
+    <br>
+    <a href="../uploads/<?= htmlspecialchars($booking['bukti_pembayaran']) ?>" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
+        <i class="fas fa-file-image me-1"></i>Lihat Bukti
+    </a>
+
+<?php elseif ($booking['pembayaran_dp_status'] === 'pending'): ?>
+    <span class="status-badge" style="background-color: #FFEFD5; color: #856404;">Menunggu Verifikasi</span>
+    <br>
+    <a href="../uploads/<?= htmlspecialchars($booking['bukti_pembayaran']) ?>" target="_blank" class="btn btn-sm btn-outline-secondary mt-2">
+        <i class="fas fa-clock me-1"></i>Lihat Bukti</a>
+
+<?php elseif ($booking['pembayaran_dp_status'] === 'ditolak'): ?>
+    <span class="status-badge" style="background-color: #F8D7DA; color: #721C24;">Pembayaran Ditolak</span>
+    <br>
+    <a href="pembayaran.php?id=<?= $booking['id_booking'] ?>" class="btn btn-sm btn-warning mt-2">
+        <i class="fas fa-redo me-1"></i>Upload Ulang Bukti
+    </a>
+
+<?php else: ?>
+    <span class="status-badge" style="background-color: #FFF3CD; color: #856404;">Belum Bayar DP</span>
+    <br>
+    <a href="pembayaran.php?id=<?= $booking['id_booking'] ?>" class="btn btn-sm btn-primary mt-2">
+        <i class="fas fa-wallet me-1"></i>Bayar DP Sekarang
+    </a>
+<?php endif; ?>
+
     </div>
 </div>
 
