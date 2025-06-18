@@ -30,7 +30,6 @@ if (!$booking || $booking['id_client'] != $_SESSION['id_client']) {
     exit();
 }
 
-// Cek apakah sudah ada pembayaran lunas untuk booking ini
 $pembayaranLunas = $modelPembayaran->cekPembayaranLunas($id_booking);
 if ($pembayaranLunas) {
     $_SESSION['error_message'] = 'Pembayaran lunas untuk booking ini sudah dilakukan.';
@@ -38,7 +37,6 @@ if ($pembayaranLunas) {
     exit();
 }
 
-// Hitung total harga dan sisa pelunasan
 $total_harga = $modelBooking->hitungTotalHarga($id_booking);
 $jumlah_dp = ceil($total_harga * 0.3);
 $jumlah_lunas = $total_harga - $jumlah_dp;
@@ -108,13 +106,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
-    // $result = $modelPembayaran->simpanPembayaran(
-    //     $id_booking,
-    //     'lunas', 
-    //     $jumlah_lunas_post,
-    //     $filename,
-    //     $metode
-    // );
     $result = $modelPembayaran->simpanPembayaran(
     $id_booking,
     'lunas', 

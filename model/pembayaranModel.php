@@ -31,12 +31,10 @@ public function simpanPembayaran($id_booking, $jenis, $jumlah, $bukti_pembayaran
     public function verifikasiPembayaran($id_pembayaran, $status_pembayaran, $alasan = null) {
         global $conn;
 
-        // Ambil data pembayaran untuk keperluan logika tambahan
         $pembayaran = $this->getPembayaranById($id_pembayaran);
 
         if (!$pembayaran) return false;
 
-        // Update status_pembayaran dan alasan penolakan
         if ($status_pembayaran === 'ditolak') {
             $stmt = $conn->prepare("UPDATE pembayaran SET status_pembayaran = ?, alasan_penolakan = ? WHERE id_pembayaran = ?");
             $stmt->bind_param("ssi", $status_pembayaran, $alasan, $id_pembayaran);
@@ -47,7 +45,6 @@ public function simpanPembayaran($id_booking, $jenis, $jumlah, $bukti_pembayaran
 
         $stmt->execute();
 
-        // Jika pelunasan diterima, update status_pembayaran booking jadi 'terjadwal'
         if ($status_pembayaran === 'dibayar' && $pembayaran['jenis'] === 'pelunasan') {
             $this->bookingModel->updateStatus($pembayaran['id_booking'], 'terjadwal');
         }
@@ -68,10 +65,10 @@ public function cekDPTelahDibayar($id_booking) {
     $result = $stmt->get_result();
 
     if ($result && $result->num_rows > 0) {
-        return $result->fetch_assoc(); // bisa status 'dibayar', 'pending', atau 'ditolak'
+        return $result->fetch_assoc(); 
     }
 
-    return null; // Belum bayar DP
+    return null; 
 }
 
 
@@ -92,37 +89,6 @@ public function cekDPTelahDibayar($id_booking) {
         return $stmt->get_result()->fetch_assoc();
     }
 
-    // public function cekPelunasan($id_booking) {
-    //     global $conn;
-    //     $stmt = $conn->prepare("SELECT * FROM pembayaran 
-    //                             WHERE id_booking = ? AND jenis = 'pelunasan' AND status_pembayaran = 'dibayar'");
-    //     $stmt->bind_param("i", $id_booking);
-    //     $stmt->execute();
-    //     return $stmt->get_result()->fetch_assoc();
-    // }
-    // public function cekPembayaranLunas($id_booking) {
-    // global $conn;
-    
-    // try {
-    //     $stmt = $conn->prepare("SELECT * FROM pembayaran 
-    //                           WHERE id_booking = ? AND jenis_pembayaran = 'lunas'");
-    //     if (!$stmt) {
-    //         throw new Exception("Prepare statement error: " . $conn->error);
-    //     }
-        
-    //     $stmt->bind_param("i", $id_booking);
-        
-    //     if (!$stmt->execute()) {
-    //         throw new Exception("Execute statement error: " . $stmt->error);
-    //     }
-        
-    //     $result = $stmt->get_result();
-    //     return $result->fetch_assoc();
-        
-    // } catch (Exception $e) {
-    //     error_log("Error in cekPembayaranLunas: " . $e->getMessage());
-    //     return false;
-    // }
     public function cekPembayaranLunas($id_booking) {
     global $conn;
     $sql = "SELECT * FROM pembayaran 

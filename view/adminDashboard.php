@@ -5,28 +5,22 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     exit;
 }
 
-// Koneksi ke database dan ambil data booking
-require_once '../config/dbconnect.php'; // Pastikan file ini berisi koneksi ke database
+require_once '../config/dbconnect.php'; 
 
-// Hitung total booking
-// Total booking
 $query_total = "SELECT COUNT(*) as total FROM booking";
 $result_total = mysqli_query($conn, $query_total);
 $total_booking = mysqli_fetch_assoc($result_total)['total'];
 
-// Booking baru (hari ini)
 $today = date('Y-m-d');
 $query_new = "SELECT COUNT(*) as new FROM booking WHERE tanggal = '$today'";
 $result_new = mysqli_query($conn, $query_new);
 $new_booking = mysqli_fetch_assoc($result_new)['new'];
 
-// Total stylist
 $query_stylist = "SELECT COUNT(*) as total FROM stylist";
 $result_stylist = mysqli_query($conn, $query_stylist);
 $total_stylist = mysqli_fetch_assoc($result_stylist)['total'];
 
-// Booking terbaru
-// Booking terbaru
+
 $query_recent = "SELECT b.*, c.nama_client, s.nama_stylist, 
     GROUP_CONCAT(l.nama_layanan SEPARATOR ', ') AS nama_layanan
     FROM booking b
@@ -98,7 +92,6 @@ $recent_bookings = mysqli_fetch_all($result_recent, MYSQLI_ASSOC);
 
   <main class="ml-64 p-6 pt-20 transition-all duration-300">
     <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Welcome Card -->
       <div class="bg-white rounded-xl shadow-sm smooth-border border-l-4 p-6 card-hover">
         <h3 class="text-xl font-semibold mb-2">Selamat datang Admin, <?= htmlspecialchars($_SESSION['username']) ?>!</h3>
         <p class="text-[var(--primary-dark)] mb-4">Kelola data stylist, layanan, dan booking secara mudah melalui menu di samping.</p>
@@ -107,7 +100,6 @@ $recent_bookings = mysqli_fetch_all($result_recent, MYSQLI_ASSOC);
         </a>
       </div>
 
-      <!-- Statistik -->
       <div class="bg-gradient-to-br from-[var(--primary-light)] to-white rounded-xl shadow-sm smooth-border border-l-4 p-6 card-hover">
         <h3 class="text-xl font-semibold mb-2">Statistik Hari Ini</h3>
         <div class="flex space-x-4 mt-4">
@@ -126,7 +118,6 @@ $recent_bookings = mysqli_fetch_all($result_recent, MYSQLI_ASSOC);
         </div>
       </div>
 
-      <!-- Recent Bookings -->
       <div class="bg-white rounded-xl shadow-sm p-6 col-span-1 md:col-span-2 card-hover">
         <h3 class="text-xl font-semibold mb-4 pb-2 border-b border-[var(--primary-medium)]">Booking Terbaru</h3>
         <div class="overflow-x-auto">

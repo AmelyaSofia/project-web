@@ -82,7 +82,6 @@ unset($booking);
             padding: 0;
         }
         
-        /* Navbar Style */
         .navbar {
             background-color: white !important;
             color: var(--dark-color) !important;

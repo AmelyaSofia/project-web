@@ -84,7 +84,6 @@
 <body>
   <div class="container-fluid">
     <div class="row">
-      <!-- Sidebar -->
       <div class="col-md-2 sidebar d-flex flex-column p-3">
         <div class="logo-title mb-4">
           <img src="image/logo.png" alt="Logo Royal Beauty" style="max-height: 120px;">
@@ -98,9 +97,7 @@
         <a href="#" class="nav-link active mt-auto"><i class="fa fa-question-circle me-2"></i> Bantuan</a>
       </div>
 
-      <!-- Main Content -->
       <div class="col-md-10 p-4">
-        <!-- Header -->
         <div class="dashboard-header mb-4 d-flex justify-content-between align-items-center">
           <div>
             <h5>Selamat Datang, Admin Royal</h5>
@@ -111,16 +108,13 @@
             <img src="image\yoona.jpg" alt="Admin Profile" class="profile-img">
           </div>
         </div>
-        <!-- Charts & Stats -->
         <div class="row mb-4">
-          <!-- Activity Chart diperbesar menjadi 9 kolom -->
           <div class="col-md-9">
             <div class="bg-white p-3 rounded shadow-sm">
               <h6>Aktivitas Mingguan</h6>
               <canvas id="activityChart"></canvas>
             </div>
           </div>
-          <!-- Clients & Finance -->
           <div class="col-md-3">
             <div class="bg-white p-3 rounded mb-3">
               <h6>Total Klien</h6>
@@ -133,7 +127,6 @@
           </div>
         </div>
 
-        <!-- Popular Services -->
         <div class="row">
           <h6>Layanan Populer</h6>
           <div class="col-md-4">
@@ -156,7 +149,6 @@
           </div>
         </div>
 
-        <!-- Team Section -->
         <div class="row mt-4">
           <h6>Tim Salon</h6>
           <div class="col-md-6">

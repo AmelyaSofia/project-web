@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Inisialisasi semua variabel
 $id_booking = 0;
 $upload_error = '';
 $success_message = '';
@@ -19,7 +18,6 @@ require_once __DIR__ . '/../model/bookingModel.php';
 $modelPembayaran = new ModelPembayaran();
 $modelBooking = new ModelBooking();
 
-// Ambil ID Booking
 $id_booking = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 if ($id_booking > 0) {
@@ -29,10 +27,9 @@ if ($id_booking > 0) {
         exit();
     }
     $total_harga = $modelBooking->hitungTotalHarga($id_booking);
-    $jumlah_dp = ceil($total_harga * 0.3); // Hitung 30%
+    $jumlah_dp = ceil($total_harga * 0.3); 
 }
 
-// Data metode pembayaran
 $metode_pembayaran = [
     'QRIS' => [
         'type' => 'qris',
@@ -54,11 +51,9 @@ $metode_pembayaran = [
     ]
 ];
 
-// Proses form submit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $metode = $_POST['metode'] ?? '';
 
-    // Validasi file upload
     if (isset($_FILES['bukti']) && $_FILES['bukti']['error'] === UPLOAD_ERR_OK) {
         $file = $_FILES['bukti'];
         $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];

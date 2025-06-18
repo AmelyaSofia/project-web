@@ -10,10 +10,8 @@ $controller = new ControllerBooking();
 
 $id_layanan = $_GET['id'] ?? null;
 
-// Ambil semua layanan untuk checkbox
-$layanan = $controller->modelLayanan->getLayanans(); // Pastikan method ini ada
+$layanan = $controller->modelLayanan->getLayanans();
 
-// Ambil layanan yang diklik untuk bagian "Layanan yang dipilih"
 $layanan_dipilih = [];
 if ($id_layanan) {
     $layanan_terpilih = $controller->modelLayanan->getLayananById($id_layanan);
@@ -31,7 +29,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $waktu = $_POST['waktu'];
     $catatan = $_POST['catatan'] ?? '';
 
-    // Ambil layanan dari checkbox
     $layanan_list = isset($_POST['id_layanan']) ? (array)$_POST['id_layanan'] : [];
 
     if (empty($layanan_list)) {
@@ -88,7 +85,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: var(--dark-color);
         }
         
-        /* Navbar Style */
         .navbar {
             background-color: white !important;
             color: var(--dark-color) !important;
@@ -142,7 +138,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             width: 100%;
         }
         
-        /* Booking Form */
         .booking-container {
             padding: 80px 0;
             flex: 1;
@@ -222,7 +217,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-weight: 600;
         }
         
-        /* Footer Styles */
         footer {
             background-color: var(--dark-color);
             color: white;
@@ -396,7 +390,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 <?php endif; ?>
 
-                <!-- Menampilkan layanan yang dipilih -->
 <div class="service-info mb-3">
     <h5>Layanan yang dipilih:</h5>
     <?php if (!empty($layanan_dipilih)): ?>
@@ -413,13 +406,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php endif; ?>
 </div>
 
-<!-- Form Booking -->
 <form method="POST">
     <div class="mb-3">
         <label class="form-label">Pilih Layanan</label>
         <?php foreach ($layanan as $l): ?>
             <?php
-                // Cek apakah layanan ini yang diklik di awal
                 $checked = ($id_layanan == $l['id_layanan']) ? 'checked' : '';
             ?>
             <div class="form-check">
@@ -522,7 +513,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <script>
-        // Set minimum date to today
         document.querySelector('input[name="tanggal"]').min = new Date().toISOString().split('T')[0];
     </script>
 </body>

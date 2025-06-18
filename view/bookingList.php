@@ -18,12 +18,10 @@
             </div>
         <?php endif; ?>
 
-        <!-- Form Tambah/Update -->
         <div class="bg-white p-6 rounded-xl shadow-md mb-8">
             <h2 class="text-2xl font-semibold mb-4"><?php echo isset($booking) ? "Update Booking" : "Tambah Booking"; ?></h2>
             <form method="POST" action="index.php?modul=booking&fitur=<?php echo isset($booking) ? "update&id_booking=" . $booking['id_booking'] : "tambah"; ?>" class="grid gap-4">
                 
-                <!-- Client -->
                 <div>
                     <label class="block font-medium">Client:</label>
                     <select name="id_client" class="w-full p-2 border border-gray-300 rounded-lg" required>
@@ -40,7 +38,6 @@
                     </select>
                 </div>
 
-                <!-- Stylist -->
                 <div>
                     <label class="block font-medium">Stylist:</label>
                     <select name="id_stylist" class="w-full p-2 border border-gray-300 rounded-lg" required>
@@ -57,7 +54,6 @@
                     </select>
                 </div>
 
-                <!-- Layanan -->
                 <div>
     <label class="block font-medium">Layanan:</label>
     <?php foreach ($layanans as $layanan): ?>
@@ -71,7 +67,6 @@
     <?php endforeach; ?>
 </div>
 
-                <!-- Tanggal dan Waktu -->
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block font-medium">Tanggal:</label>
@@ -85,7 +80,6 @@
                     </div>
                 </div>
 
-                <!-- Status (jika update) -->
                 <?php if (isset($booking)): ?>
                     <div>
                         <label class="block font-medium">Status:</label>
@@ -101,7 +95,6 @@
                     </div>
                 <?php endif; ?>
 
-                <!-- Catatan -->
                 <div>
                     <label class="block font-medium">Catatan:</label>
                     <textarea name="catatan" class="w-full p-2 border border-gray-300 rounded-lg"><?php 
@@ -109,7 +102,6 @@
                     ?></textarea>
                 </div>
 
-                <!-- Tombol -->
                 <div class="flex gap-4 items-center">
                     <button type="submit" class="bg-[#967E76] hover:bg-[#D7C0AE] text-white px-6 py-2 rounded-lg">
                         <?php echo isset($booking) ? "Update" : "Tambah"; ?>
@@ -121,7 +113,6 @@
             </form>
         </div>
 
-        <!-- Search -->
         <form method="GET" class="mb-4">
             <input type="hidden" name="modul" value="booking">
             <input type="hidden" name="fitur" value="booking">
@@ -129,7 +120,6 @@
             <button type="submit" class="ml-2 bg-[#967E76] text-white px-4 py-2 rounded-lg hover:bg-[#D7C0AE]">Cari</button>
         </form>
 
-        <!-- Table -->
         <div class="overflow-x-auto">
             <table class="w-full border text-sm text-left bg-white shadow-md rounded-xl">
                 <thead class="bg-[#967E76] text-white">
@@ -138,7 +128,7 @@
                         <th class="p-3">Client</th>
                         <th class="p-3">Stylist</th>
                         <th class="p-3">Layanan</th>
-                        <th class="p-3">Harga</th> <!-- Tambahan -->
+                        <th class="p-3">Harga</th> 
                         <th class="p-3">Tanggal</th>
                         <th class="p-3">Waktu</th>
                         <th class="p-3">Status</th>

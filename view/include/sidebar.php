@@ -1,14 +1,9 @@
-<!-- Google Font -->
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet">
-
-<!-- Sidebar -->
 <aside class="w-64 h-screen fixed top-0 left-0 bg-[#967E76] text-white shadow-md p-6 space-y-6">
-  <!-- Brand -->
   <div class="text-2xl font-bold text-center text-[#EEE3CB]" style="font-family: 'Playfair Display', serif;">
     ROYAL BEAUTY
   </div>
 
-  <!-- Navigation -->
   <nav class="space-y-3 text-sm" style="font-family: 'Inter', sans-serif;">
     <a href="view/admindashboard.php" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-[#D7C0AE] transition">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"

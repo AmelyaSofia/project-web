@@ -4,12 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manajemen Stylist - Royal Beauty</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script> 
-    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet">
 
-    <!-- Custom Tailwind Config -->
     <script>
         tailwind.config = {
             theme: {
@@ -38,13 +35,10 @@
 </head>
 <body class="bg-gray-100 min-h-screen font-inter">
 
-<!-- Flex Layout -->
 <div class="flex min-h-screen">
 
-    <!-- Sidebar -->
     <?php include 'include/sidebar.php'; ?>
 
-    <!-- Main Content -->
     <main class="ml-64 p-6 w-full bg-white min-h-screen">
         <h1 class="text-3xl font-bold mb-4 text-gray-800">Data Stylist</h1>
 
@@ -52,7 +46,6 @@
             <div class="p-3 mb-4 bg-green-100 text-green-700 rounded"><?php echo htmlspecialchars($_GET['message']); ?></div>
         <?php endif; ?>
 
-        <!-- Search Form -->
         <div class="mb-6">
             <form method="GET" action="index.php" class="flex gap-2">
                 <input type="hidden" name="modul" value="stylist">
@@ -64,7 +57,6 @@
             </form>
         </div>
 
-        <!-- Add / Edit Form -->
         <div class="mb-8 bg-gray-50 p-6 rounded-lg shadow-sm">
             <?php if (isset($_GET['fitur']) && $_GET['fitur'] == 'update' && isset($stylist)): ?>
                 <h2 class="text-xl font-semibold mb-4">Update Stylist</h2>
@@ -98,7 +90,6 @@
             <?php endif; ?>
         </div>
 
-        <!-- Table of Stylists -->
         <h2 class="text-xl font-semibold mb-4">Daftar Stylist</h2>
         <div class="overflow-x-auto">
             <table class="min-w-full bg-white border border-gray-300 rounded-lg">

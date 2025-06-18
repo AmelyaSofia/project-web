@@ -18,7 +18,6 @@
         </div>
     <?php endif; ?>
 
-    <!-- Tabel Pembayaran -->
     <div class="overflow-x-auto">
         <table class="w-full border text-sm text-left bg-white shadow-md rounded-xl">
             <thead class="bg-[#967E76] text-white">

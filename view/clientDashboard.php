@@ -37,7 +37,6 @@ $layanans = mysqli_query($conn, $query);
             padding: 0;
         }
         
-        /* Navbar Style */
         .navbar {
             background-color: white !important;
             color: var(--dark-color) !important;
@@ -91,7 +90,6 @@ $layanans = mysqli_query($conn, $query);
             width: 100%;
         }
         
-        /* Animated Hero Banner */
         .hero-banner {
             position: relative;
             height: 500px;
@@ -222,7 +220,6 @@ $layanans = mysqli_query($conn, $query);
             transform: scale(1.2);
         }
         
-        /* Card Styles */
         .card {
             border: none;
             border-radius: 15px;
@@ -319,7 +316,6 @@ $layanans = mysqli_query($conn, $query);
             line-height: 1.8;
         }
         
-        /* About Section */
         .about-section {
             padding: 80px 0;
             background-color: #f9f5f0;
@@ -354,7 +350,6 @@ $layanans = mysqli_query($conn, $query);
             margin-bottom: 20px;
         }
         
-        /* View More Button */
         .view-more-btn {
             display: block;
             text-align: center;
@@ -375,12 +370,10 @@ $layanans = mysqli_query($conn, $query);
             transform: translateY(-3px);
         }
         
-        /* Hidden Services */
         .hidden-services {
             display: none;
         }
         
-        /* Footer Styles */
         footer {
             background-color: var(--dark-color);
             color: white;

@@ -55,23 +55,3 @@ switch ($modul) {
 }
 
 
-// $modul = $_GET['modul'] ?? 'booking';
-// $fitur = $_GET['fitur'] ?? 'list';
-
-// switch ($modul) {
-//     case 'layanan':
-//         include './controller/layananController.php';
-//         $controllerLayanan = new ControllerLayanan();
-//         $controllerLayanan->handleRequest($fitur);
-//         break;
-//     case 'stylist':
-//         include './controller/stylistController.php';
-//         $controllerStylist = new ControllerStylist();
-//         $controllerStylist->handleRequest($fitur);
-//         break;
-//     case 'booking':
-//         include './controller/bookingController.php';
-//         $controllerBooking = new ControllerBooking();
-//         $controllerBooking->handleRequest($fitur);
-//         break;
-// }

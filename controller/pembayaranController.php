@@ -14,13 +14,11 @@ class ControllerPembayaran {
     public function handleRequest($fitur) {
         switch ($fitur) {
 
-            // ✅ Admin melihat semua pembayaran
             case 'list':
                 $pembayarans = $this->model->getAllPembayaran();
                 include __DIR__ . '/../view/pembayaranList.php';
                 break;
 
-            // ✅ Admin melakukan verifikasi pembayaran
             case 'verifikasi':
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['id']) && isset($_POST['aksi'])) {
                     $id_pembayaran = $_GET['id'];
@@ -38,7 +36,6 @@ class ControllerPembayaran {
                 }
                 break;
 
-            // ✅ Client mengupload bukti pembayaran (DP atau pelunasan)
             case 'upload':
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_pembayaran'])) {
                     $id_booking = intval($_POST['id_booking']);

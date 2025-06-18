@@ -56,7 +56,6 @@ class ModelBooking {
 public function addBooking($id_client, $id_stylist, $tanggal, $waktu, $catatan, $layanan_list) {
     global $conn;
 
-    // Insert ke tabel booking
     $sql = "INSERT INTO booking (id_client, id_stylist, tanggal, waktu, status, catatan) 
             VALUES (?, ?, ?, ?, 'menunggu', ?)";
     $stmt = $conn->prepare($sql);
@@ -66,10 +65,8 @@ public function addBooking($id_client, $id_stylist, $tanggal, $waktu, $catatan, 
         return false;
     }
 
-    // Ambil ID booking yang baru saja dibuat
     $id_booking = $conn->insert_id;
 
-    // Simpan layanan yang dipilih ke tabel booking_layanan
     $sqlLayanan = "INSERT INTO booking_layanan (id_booking, id_layanan) VALUES (?, ?)";
     $stmtLayanan = $conn->prepare($sqlLayanan);
 
@@ -78,7 +75,6 @@ public function addBooking($id_client, $id_stylist, $tanggal, $waktu, $catatan, 
         $stmtLayanan->execute();
     }
 
-    // Kembalikan ID booking agar bisa digunakan untuk redirect ke pembayaran
     return $id_booking;
 }
 
@@ -95,10 +91,8 @@ public function addBooking($id_client, $id_stylist, $tanggal, $waktu, $catatan, 
             return false;
         }
 
-        // Hapus layanan lama
         $conn->query("DELETE FROM booking_layanan WHERE id_booking = $id_booking");
 
-        // Tambahkan layanan baru
         $sqlLayanan = "INSERT INTO booking_layanan (id_booking, id_layanan) VALUES (?, ?)";
         $stmtLayanan = $conn->prepare($sqlLayanan);
 
@@ -121,7 +115,6 @@ public function addBooking($id_client, $id_stylist, $tanggal, $waktu, $catatan, 
     public function deleteBooking($id_booking) {
         global $conn;
 
-        // Hapus dari tabel relasi terlebih dahulu
         $conn->query("DELETE FROM booking_layanan WHERE id_booking = $id_booking");
 
         $sql = "DELETE FROM booking WHERE id_booking = ?";
@@ -206,7 +199,6 @@ public function addBooking($id_client, $id_stylist, $tanggal, $waktu, $catatan, 
     public function hitungTotalHarga($id_booking) {
     global $conn;
 
-    // Hitung total harga dari semua layanan dalam booking ini
     $sql = "SELECT SUM(l.harga) AS total 
             FROM booking_layanan bl
             JOIN layanan l ON bl.id_layanan = l.id_layanan

@@ -95,10 +95,8 @@
 </head>
 <body>
 
-<!-- Include Sidebar -->
 <?php include 'include/sidebar.php'; ?>
 
-<!-- Main Content -->
 <div class="content">
     <h1 class="text-3xl font-bold text-[#967E76] mb-6 brand-font">Data Layanan</h1>
 
@@ -108,7 +106,6 @@
         </div>
     <?php endif; ?>
 
-    <!-- Search Form -->
     <div class="bg-white p-4 rounded-lg shadow mb-6">
         <form method="GET" action="index.php" class="flex items-center gap-4">
             <input type="hidden" name="fitur" value="layanan">
@@ -119,7 +116,6 @@
         </form>
     </div>
 
-    <!-- Form Tambah / Update -->
     <div class="bg-white p-6 rounded-lg shadow mb-8">
         <?php if (isset($_GET['fitur']) && $_GET['fitur'] === 'update' && isset($layanan)): ?>
             <h2 class="text-2xl font-semibold text-[#967E76] mb-4">Update Layanan</h2>
@@ -175,7 +171,6 @@
         <?php endif; ?>
     </div>
 
-    <!-- Table of Services -->
     <div class="bg-white p-6 rounded-lg shadow">
         <h2 class="text-2xl font-semibold text-[#967E76] mb-4">Daftar Layanan</h2>
         <div class="overflow-x-auto">

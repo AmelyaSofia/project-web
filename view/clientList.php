@@ -9,12 +9,9 @@
 </head>
 <body class="bg-[#f8f9fa] flex">
 
-  <!-- Sidebar -->
  <?php include 'include/sidebar.php'; ?>
 
-  <!-- Konten Utama -->
   <main class="ml-64 p-6 w-full bg-white min-h-screen">
-    <!-- Header -->
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-3xl font-bold text-[#5F5B5B]">Client Management</h1>
       <button onclick="toggleModal()" class="bg-[#967E76] text-white px-4 py-2 rounded shadow hover:bg-[#7e665f]">
@@ -22,7 +19,6 @@
       </button>
     </div>
 
-    <!-- Statistik -->
     <div class="grid grid-cols-4 gap-4 mb-8">
       <div class="bg-white rounded-lg shadow p-4">
         <div class="font-semibold text-sm text-gray-500">Total Client</div>
@@ -30,7 +26,6 @@
       </div>
     </div>
 
-    <!-- Tabel -->
     <div class="bg-white shadow rounded-lg overflow-x-auto mb-6">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gradient-to-r from-[#EEE3CB] to-[#D7C0AE]">
@@ -70,7 +65,6 @@
     </div>
   </div>
 
-  <!-- Modal Form -->
   <div id="clientModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
     <div class="bg-white rounded-lg shadow-lg w-full max-w-xl p-6 relative">
       <button onclick="toggleModal()" class="absolute top-2 right-2 text-gray-500 text-xl">&times;</button>
