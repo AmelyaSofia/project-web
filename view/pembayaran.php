@@ -1,11 +1,12 @@
 <?php
 session_start();
 
+// Inisialisasi semua variabel
 $id_booking = 0;
 $upload_error = '';
 $success_message = '';
 $total_harga = 0;
-$jumlah_dp = 0; 
+$jumlah_dp = 0;
 
 if (!isset($_SESSION['id_client'])) {
     header("Location: index.php");
@@ -18,6 +19,7 @@ require_once __DIR__ . '/../model/bookingModel.php';
 $modelPembayaran = new ModelPembayaran();
 $modelBooking = new ModelBooking();
 
+// Ambil ID Booking
 $id_booking = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 if ($id_booking > 0) {
@@ -27,7 +29,7 @@ if ($id_booking > 0) {
         exit();
     }
     $total_harga = $modelBooking->hitungTotalHarga($id_booking);
-    $jumlah_dp = ceil($total_harga * 0.3); 
+    $jumlah_dp = ceil($total_harga * 0.3); // Hitung 30%
 }
 
 // Data metode pembayaran
@@ -52,37 +54,28 @@ $metode_pembayaran = [
     ]
 ];
 
-// Penanganan form submit
+// Proses form submit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $metode = $_POST['metode'] ?? '';
-    
+
     // Validasi file upload
     if (isset($_FILES['bukti']) && $_FILES['bukti']['error'] === UPLOAD_ERR_OK) {
         $file = $_FILES['bukti'];
-        
-        // Validasi tipe file
         $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
+
         if (!in_array($file['type'], $allowed_types)) {
             $upload_error = 'Format file tidak didukung. Harus JPG, JPEG, PNG, atau GIF.';
-        } 
-        // Validasi ukuran file (max 2MB)
-        elseif ($file['size'] > 2097152) {
+        } elseif ($file['size'] > 2097152) {
             $upload_error = 'Ukuran file terlalu besar. Maksimal 2MB.';
         } else {
-            // Pastikan folder uploads ada
             $upload_dir = __DIR__ . '/../uploads/';
-            if (!file_exists($upload_dir)) {
-                mkdir($upload_dir, 0777, true);
-            }
-            
-            // Generate nama file unik
+            if (!file_exists($upload_dir)) mkdir($upload_dir, 0777, true);
+
             $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
             $filename = 'bukti_dp_' . $id_booking . '_' . time() . '.' . $ext;
             $upload_path = $upload_dir . $filename;
-            
-            // Pindahkan file
+
             if (move_uploaded_file($file['tmp_name'], $upload_path)) {
-                // Simpan data pembayaran ke database
                 $result = $modelPembayaran->simpanPembayaran(
                     $id_booking,
                     'dp',
@@ -90,23 +83,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $filename,
                     $metode
                 );
-                
+
                 if ($result) {
-                    // Update status booking
-                    $status = 'menunggu';
-                    $modelBooking->updateStatus($id_booking, $status);
-                    
-                    // Set session success message
+                    $modelBooking->updateStatus($id_booking, 'menunggu');
                     $_SESSION['success_message'] = 'Bukti pembayaran DP berhasil diupload!';
-                    
-                    // Redirect ke halaman riwayat
                     header("Location: riwayatBooking.php");
                     exit();
                 } else {
-                    $upload_error = 'Gagal menyimpan data pembayaran. Silakan coba lagi.';
+                    $upload_error = 'Gagal menyimpan data pembayaran.';
                 }
             } else {
-                $upload_error = 'Gagal mengunggah file. Silakan coba lagi.';
+                $upload_error = 'Gagal mengunggah file.';
             }
         }
     } else {
@@ -114,241 +101,198 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <title>Pembayaran DP - Royal Beauty</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary: #6a1b9a;
-            --secondary: #9c27b0;
-            --light: #f3e5f5;
-            --dark: #4a148c;
-            --success: #4caf50;
+            --primary: #8B4513;
+            --primary-light: #D2B48C;
+            --primary-dark: #5D4037;
+            --secondary: #D4AF37;
+            --background: #F5F5DC;
+            --text: #5D4037;
+            --text-light: #8B8B8B;
+            --white: #FFFFFF;
+            
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            
+            --radius-sm: 5px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            
+            --shadow-sm: 0 2px 5px rgba(0,0,0,0.1);
         }
         
         body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background);
+            font-family: 'Poppins', sans-serif;
         }
         
-        .container {
-            max-width: 800px;
-            margin-top: 40px;
-            margin-bottom: 60px;
+        .compact-card {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            background: var(--white);
         }
         
-        .payment-card {
-            background-color: white;
-            border-radius: 15px;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-            padding: 30px;
-            margin-bottom: 30px;
+        .card-title {
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--secondary);
         }
         
-        .payment-header {
-            border-bottom: 2px solid var(--light);
-            padding-bottom: 15px;
-            margin-bottom: 25px;
+        .amount-box {
+            background: linear-gradient(to right, #f8f3e6, #f5f5dc);
+            border-left: 4px solid var(--secondary);
+            padding: 0.75rem;
+            border-radius: var(--radius-sm);
+            margin-bottom: 1.25rem;
         }
         
-        .payment-method {
+        .amount-main {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+        
+        .amount-note {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+        
+        .payment-method-box {
             display: none;
-            animation: fadeIn 0.5s;
-            background-color: var(--light);
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
+            background: rgba(210, 180, 140, 0.1);
+            padding: 0.75rem;
+            border-radius: var(--radius-sm);
+            margin-bottom: 1rem;
+            border-left: 3px solid var(--secondary);
         }
         
-        .payment-method.active {
-            display: block;
+        .form-control, .form-select {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.9rem;
         }
         
-        .qr-code-container {
-            text-align: center;
-            margin: 20px 0;
-        }
-        
-        .qr-code {
-            max-width: 250px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 10px;
-            background: white;
-        }
-        
-        .bank-details {
-            background-color: white;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 15px;
-        }
-        
-        .bank-details p {
-            margin-bottom: 8px;
-        }
-        
-        .bank-details strong {
-            color: var(--dark);
+        .btn {
+            padding: 0.5rem 1.25rem;
+            font-size: 0.9rem;
         }
         
         .btn-primary {
             background-color: var(--primary);
-            border-color: var(--primary);
-            padding: 10px 25px;
-            border-radius: 8px;
-            font-weight: 500;
-        }
-        
-        .btn-primary:hover {
-            background-color: var(--secondary);
-            border-color: var(--secondary);
+            border: none;
         }
         
         .btn-secondary {
-            background-color: #6c757d;
-            border-color: #6c757d;
+            background-color: var(--primary-light);
+            color: var(--text);
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .method-icon {
-            font-size: 1.2rem;
-            margin-right: 8px;
-            color: var(--primary);
-        }
-        
-        .dp-amount {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--dark);
-            background-color: var(--light);
-            padding: 8px 20px;
-            border-radius: 8px;
-            display: inline-block;
-            margin: 10px 0;
+        @media (max-width: 576px) {
+            .compact-card {
+                margin: 1rem;
+                padding: 1rem;
+            }
+            
+            .card-title {
+                font-size: 1.2rem;
+            }
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="payment-card">
-        <div class="payment-header">
-            <h2><i class="fas fa-wallet"></i> Pembayaran DP</h2>
-            <p class="text-muted">Silakan unggah bukti pembayaran DP untuk Booking ID: <strong><?= htmlspecialchars($id_booking) ?></strong></p>
-        </div>
+    <div class="compact-card">
+        <h2 class="card-title"><i class="fas fa-wallet me-2"></i>Pembayaran DP</h2>
+        <p class="text-muted small mb-3">Booking ID: <strong><?= htmlspecialchars($id_booking) ?></strong></p>
 
         <?php if ($upload_error): ?>
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-circle me-2"></i><?= htmlspecialchars($upload_error) ?>
-            </div>
+            <div class="alert alert-danger small py-2"><?= htmlspecialchars($upload_error) ?></div>
         <?php elseif ($success_message): ?>
-            <div class="alert alert-success">
-                <i class="fas fa-check-circle me-2"></i><?= htmlspecialchars($success_message) ?>
+            <div class="alert alert-success small py-2"><?= htmlspecialchars($success_message) ?></div>
+            <div class="text-center mt-3">
+                <a href="riwayatBooking.php" class="btn btn-primary btn-sm">Kembali ke Riwayat</a>
             </div>
-            <a href="riwayatBooking.php" class="btn btn-success mt-3">
-                <i class="fas fa-arrow-left me-1"></i> Kembali ke Riwayat Booking
-            </a>
         <?php else: ?>
             <form method="post" enctype="multipart/form-data">
                 <input type="hidden" name="jumlah_dp" value="<?= htmlspecialchars($jumlah_dp) ?>">
-                
-            <div class="mb-4">
-                <h5><i class="fas fa-money-bill-wave method-icon"></i>Jumlah DP</h5>
-                <div class="dp-amount">Rp <?= number_format($jumlah_dp, 0, ',', '.') ?></div>
-                <p class="text-muted"><i class="fas fa-info-circle"></i> Jumlah DP adalah 30% dari total harga booking (<?= number_format($total_harga, 0, ',', '.') ?>)</p>
-                <p class="text-muted"><i class="fas fa-clock"></i> Pembayaran akan diverifikasi dalam 1x24 jam</p>
-            </div>
-                
-                <div class="mb-4">
-                    <label for="metode" class="form-label">
-                        <i class="fas fa-credit-card method-icon"></i>Metode Pembayaran
-                    </label>
-                    <select name="metode" id="metode" class="form-select" required onchange="showPaymentMethod(this.value)">
-                        <option value="">Pilih Metode Pembayaran</option>
+
+                <div class="amount-box">
+                    <div class="amount-main text-center">Rp <?= number_format($jumlah_dp, 0, ',', '.') ?></div>
+                    <div class="amount-note text-center">DP 30% dari total Rp <?= number_format($total_harga, 0, ',', '.') ?></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Metode Pembayaran</label>
+                    <select name="metode" id="metode" class="form-select form-select-sm" required onchange="showPaymentMethod(this.value)">
+                        <option value="">Pilih Metode</option>
                         <option value="QRIS">QRIS</option>
                         <option value="Transfer BANK">Transfer BANK</option>
                         <option value="Dana">Dana</option>
                     </select>
                 </div>
 
-                <!-- QRIS Method -->
-                <div id="qris-method" class="payment-method">
-                    <h5><i class="fas fa-qrcode"></i> QRIS</h5>
-                    <p>Scan QR code berikut untuk melakukan pembayaran:</p>
-                    <div class="qr-code-container">
-                        <img src="../image/qris.png" alt="QR Code Pembayaran" class="qr-code">
-                        <p class="text-muted mt-2"><i class="fas fa-info-circle"></i> Scan menggunakan aplikasi mobile banking/e-wallet</p>
+                <div id="qris-method" class="payment-method-box">
+                    <h6 class="small fw-bold"><i class="fas fa-qrcode me-2"></i>Scan QR Code:</h6>
+                    <div class="text-center">
+                        <img src="../image/qris.png" alt="QRIS" style="max-width: 180px;" class="img-fluid">
                     </div>
                 </div>
 
-                <!-- Transfer Bank Method -->
-                <div id="transfer-method" class="payment-method">
-                    <h5><i class="fas fa-university"></i> Transfer BANK</h5>
-                    <p>Transfer ke rekening berikut:</p>
-                    <div class="bank-details">
-                        <p><strong><i class="fas fa-bank"></i> Bank:</strong> BCA</p>
-                        <p><strong><i class="fas fa-user"></i> Nama:</strong> Royal Beauty Salon</p>
-                        <p><strong><i class="fas fa-credit-card"></i> No. Rekening:</strong> 1234567890</p>
+                <div id="transfer-method" class="payment-method-box">
+                    <h6 class="small fw-bold"><i class="fas fa-university me-2"></i>Transfer Bank:</h6>
+                    <div class="small">
+                        <div><strong>Bank:</strong> BCA</div>
+                        <div><strong>Nama:</strong> Royal Beauty Salon</div>
+                        <div><strong>Rekening:</strong> 1234567890</div>
                     </div>
                 </div>
 
-                <!-- Dana Method -->
-                <div id="dana-method" class="payment-method">
-                    <h5><i class="fas fa-mobile-alt"></i> Dana</h5>
-                    <p>Transfer ke akun Dana berikut:</p>
-                    <div class="bank-details">
-                        <p><strong><i class="fas fa-user"></i> Nama:</strong> Royal Beauty Salon</p>
-                        <p><strong><i class="fas fa-phone"></i> No. Dana:</strong> 081234567890</p>
+                <div id="dana-method" class="payment-method-box">
+                    <h6 class="small fw-bold"><i class="fas fa-mobile-alt me-2"></i>Dana:</h6>
+                    <div class="small">
+                        <div><strong>Nama:</strong> Royal Beauty Salon</div>
+                        <div><strong>Nomor:</strong> 081234567890</div>
                     </div>
                 </div>
 
                 <div class="mb-4">
-                    <label for="bukti" class="form-label">
-                        <i class="fas fa-file-image method-icon"></i> Unggah Bukti Pembayaran
-                    </label>
-                    <input type="file" name="bukti" id="bukti" class="form-control" required>
-                    <div class="form-text">Format: JPG, JPEG, PNG, GIF (Maks. 2MB)</div>
+                    <label class="form-label small fw-bold">Bukti Pembayaran</label>
+                    <input type="file" name="bukti" id="bukti" class="form-control form-control-sm" required>
+                    <div class="text-muted small mt-1">Format: JPG/PNG (max 2MB)</div>
                 </div>
 
-                <div class="d-flex gap-3 mt-4">
+                <div class="d-flex justify-content-between">
+                    <a href="riwayatBooking.php" class="btn btn-secondary">Batal</a>
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-paper-plane me-1"></i> Kirim Bukti
+                        <i class="fas fa-paper-plane me-1"></i>Kirim
                     </button>
-                    <a href="riwayatBooking.php" class="btn btn-secondary">
-                        <i class="fas fa-times me-1"></i> Batal
-                    </a>
                 </div>
             </form>
         <?php endif; ?>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    function showPaymentMethod(method) {
-        // Sembunyikan semua metode pembayaran terlebih dahulu
-        document.querySelectorAll('.payment-method').forEach(el => {
-            el.classList.remove('active');
-        });
-        
-        if (method === 'QRIS') {
-            document.getElementById('qris-method').classList.add('active');
-        } 
-        else if (method === 'Transfer BANK') {
-            document.getElementById('transfer-method').classList.add('active');
-        } 
-        else if (method === 'Dana') {
-            document.getElementById('dana-method').classList.add('active');
-        }
-    }
+function showPaymentMethod(method) {
+    document.querySelectorAll('.payment-method-box').forEach(el => el.style.display = 'none');
+    if (method === 'QRIS') document.getElementById('qris-method').style.display = 'block';
+    else if (method === 'Transfer BANK') document.getElementById('transfer-method').style.display = 'block';
+    else if (method === 'Dana') document.getElementById('dana-method').style.display = 'block';
+}
 </script>
 </body>
 </html>
