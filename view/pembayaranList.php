@@ -26,7 +26,6 @@ $status = $_GET['status'] ?? '';
         </div>
     <?php endif; ?>
 
-    <!-- Filter Form -->
     <div class="mb-6 bg-[#FFF3E4] p-4 rounded-lg shadow">
         <form method="get" class="flex items-end gap-4">
             <input type="hidden" name="modul" value="<?= htmlspecialchars($modul) ?>">
@@ -54,6 +53,23 @@ $status = $_GET['status'] ?? '';
                 <a href="?modul=<?= $modul ?>&fitur=<?= $fitur ?>" class="text-[#967E76] hover:underline ml-2">Reset Filter</a>
             <?php endif; ?>
         </form>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h3 class="text-xl font-bold mb-4" id="modalTitle">Konfirmasi Pembayaran</h3>
+            <p class="mb-4" id="modalMessage">Apakah Anda yakin menerima pembayaran DP/lunas ini?</p>
+            <form method="POST" id="modalForm" class="flex justify-end gap-2">
+                <input type="hidden" name="page" value="<?= $current_page ?>">
+                <input type="hidden" name="start_date" value="<?= htmlspecialchars($start_date) ?>">
+                <input type="hidden" name="end_date" value="<?= htmlspecialchars($end_date) ?>">
+                <input type="hidden" name="status" value="<?= htmlspecialchars($status) ?>">
+                <input type="hidden" name="aksi" id="modalAction" value="">
+                <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Batal</button>
+                <button type="submit" class="px-4 py-2 bg-[#967E76] text-white rounded hover:bg-[#75655e]">Ya, Lanjutkan</button>
+            </form>
+        </div>
     </div>
 
     <div class="overflow-x-auto">
@@ -101,14 +117,14 @@ $status = $_GET['status'] ?? '';
                             </td>
                             <td class="p-3 space-x-2">
                                 <?php if ($p['status_pembayaran'] === 'pending'): ?>
-                                    <form method="POST" action="index.php?modul=pembayaran&fitur=verifikasi&id=<?= $p['id_pembayaran'] ?>" class="inline">
-                                        <input type="hidden" name="page" value="<?= $current_page ?>">
-                                        <input type="hidden" name="start_date" value="<?= htmlspecialchars($start_date) ?>">
-                                        <input type="hidden" name="end_date" value="<?= htmlspecialchars($end_date) ?>">
-                                        <input type="hidden" name="status" value="<?= htmlspecialchars($status) ?>">
-                                        <button name="aksi" value="terima" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">Terima</button>
-                                        <button name="aksi" value="tolak" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Tolak</button>
-                                    </form>
+                                    <button onclick="showConfirmation('terima', <?= $p['id_pembayaran'] ?>, '<?= $p['jenis'] === 'dp' ? 'DP' : 'Lunas' ?>')" 
+                                            class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
+                                        Terima
+                                    </button>
+                                    <button onclick="showConfirmation('tolak', <?= $p['id_pembayaran'] ?>, '<?= $p['jenis'] === 'dp' ? 'DP' : 'Lunas' ?>')" 
+                                            class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                                        Tolak
+                                    </button>
                                 <?php elseif ($p['status_pembayaran'] === 'ditolak'): ?>
                                     <span class="text-red-600">Ditolak</span>
                                 <?php else: ?>
@@ -203,5 +219,32 @@ $status = $_GET['status'] ?? '';
         <?php endif; ?>
     </div>
 </main>
+
+<script>
+    function showConfirmation(action, id, jenis) {
+        const modal = document.getElementById('confirmationModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalForm = document.getElementById('modalForm');
+        const modalAction = document.getElementById('modalAction');
+        
+        if (action === 'terima') {
+            modalTitle.textContent = 'Konfirmasi Pembayaran';
+            modalMessage.textContent = `Apakah Anda yakin menerima pembayaran ${jenis} ini?`;
+            modalAction.value = 'terima';
+        } else {
+            modalTitle.textContent = 'Konfirmasi Penolakan';
+            modalMessage.textContent = `Apakah Anda yakin menolak pembayaran ${jenis} ini?`;
+            modalAction.value = 'tolak';
+        }
+        
+        modalForm.action = `index.php?modul=pembayaran&fitur=verifikasi&id=${id}`;
+        modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+        document.getElementById('confirmationModal').classList.add('hidden');
+    }
+</script>
 </body>
 </html>

@@ -468,13 +468,6 @@ unset($booking);
                 <i class="fas fa-file-image me-1"></i>Lihat Bukti
             </a>
 
-            <!-- Tampilkan tombol Bayar Lunas HANYA jika pelunasan belum dibayar -->
-            <?php if (($booking['pembayaran_lunas_status'] ?? 'belum') === 'belum'): ?>
-                <br>
-                <a href="pembayaranLunas.php?id=<?= $booking['id_booking'] ?>" class="btn btn-sm btn-success mt-2">
-                    <i class="fas fa-check-circle me-1"></i>Bayar Lunas Sekarang
-                </a>
-            <?php endif; ?>
 
         <?php elseif ($dp_status === 'pending'): ?>
             <span class="status-badge" style="background-color: #FFEFD5; color: #856404;">Menunggu Verifikasi</span>
@@ -493,7 +486,7 @@ unset($booking);
         <?php else: ?>
             <span class="status-badge" style="background-color: #FFF3CD; color: #856404;">Belum Bayar DP</span>
             <br>
-            <a href="pembayaran.php?id=<?= $booking['id_booking'] ?>" class="btn btn-sm btn-primary mt-2">
+            <a href="midtransPembayaran.php?id=<?= $booking['id_booking'] ?>" class="btn btn-sm btn-primary mt-2">
                 <i class="fas fa-wallet me-1"></i>Bayar DP Sekarang
             </a>
         <?php endif; ?>
@@ -546,7 +539,7 @@ unset($booking);
                 Belum Lunas
             </span>
             <br>
-            <a href="pembayaranLunas.php?id=<?= $booking['id_booking'] ?>" 
+            <a href="midtransLunas.php?id=<?= $booking['id_booking'] ?>" 
                class="btn btn-sm btn-success mt-2">
                 <i class="fas fa-check-circle me-1"></i>Bayar Lunas Sekarang
             </a>
