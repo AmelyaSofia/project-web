@@ -17,6 +17,9 @@ class ControllerMidtrans {
             case 'simpan':
                 $this->simpanTransaksi();
                 break;
+            case 'list':
+                include './view/midtransList.php';
+                break;
             default:
                 echo "Fitur tidak ditemukan";
         }
@@ -24,7 +27,7 @@ class ControllerMidtrans {
 
     private function buatSnapToken() {
         $id_booking = $_GET['id_booking'] ?? null;
-        $jenis = $_GET['jenis'] ?? 'dp'; // 'dp' atau 'lunas'
+        $jenis = $_GET['jenis'] ?? 'dp'; 
 
         if (!$id_booking) {
             echo "ID booking tidak ditemukan";

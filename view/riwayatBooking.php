@@ -35,19 +35,28 @@ foreach ($riwayatBookings as &$booking) {
 
     $pembayaran = $pembayaranModel->cekDPTelahDibayar($booking['id_booking']);
     if ($pembayaran) {
-        $booking['pembayaran_dp_status'] = $pembayaran['status_pembayaran']; 
-        $booking['bukti_pembayaran'] = $pembayaran['bukti_pembayaran'];
+        $booking['pembayaran_dp_status'] = $pembayaran['status_pembayaran'] ?? 'belum'; 
+        $booking['dp_order_id'] = $pembayaran['order_id'] ?? '-';
+        $booking['dp_jumlah'] = $pembayaran['jumlah'] ?? 0;
+        $booking['dp_metode_pembayaran'] = $pembayaran['metode_pembayaran'] ?? '-';
     } else {
         $booking['pembayaran_dp_status'] = 'belum';
-        $booking['bukti_pembayaran'] = null;
+        $booking['dp_order_id'] = '-';
+        $booking['dp_jumlah'] = 0;
+        $booking['dp_metode_pembayaran'] = '-';
     }
+
     $pembayaranLunas = $pembayaranModel->cekPembayaranLunas($booking['id_booking']);
     if ($pembayaranLunas) {
-        $booking['pembayaran_lunas_status'] = $pembayaranLunas['status_pembayaran'];
-        $booking['bukti_pembayaran_lunas'] = $pembayaranLunas['bukti_pembayaran'];
+        $booking['pembayaran_lunas_status'] = $pembayaranLunas['status_pembayaran'] ?? 'belum';
+        $booking['lunas_order_id'] = $pembayaranLunas['order_id'] ?? '-';
+        $booking['lunas_jumlah'] = $pembayaranLunas['jumlah'] ?? 0;
+        $booking['lunas_metode_pembayaran'] = $pembayaranLunas['metode_pembayaran'] ?? '-';
     } else {
         $booking['pembayaran_lunas_status'] = 'belum';
-        $booking['bukti_pembayaran_lunas'] = null;
+        $booking['lunas_order_id'] = '-';
+        $booking['lunas_jumlah'] = 0;
+        $booking['lunas_metode_pembayaran'] = '-';
     }
 }
 unset($booking);
@@ -337,6 +346,15 @@ unset($booking);
                 font-size: 1.8rem;
             }
         }
+
+          .detail-box {
+            background: #fefefe;
+            border-left: 4px solid #2A9D8F;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
@@ -451,106 +469,93 @@ unset($booking);
                             </div>
                         </div>
 
+
 <div class="booking-detail">
-    <div class="booking-icon">
-        <i class="fas fa-money-check-alt"></i>
-    </div>
-    <div>
-        <strong>Status DP:</strong>
+  <div class="booking-icon">
+    <i class="fas fa-money-check-alt"></i>
+  </div>
+  <div>
+    <strong>Status DP:</strong>
+    <?php $dp_status = $booking['pembayaran_dp_status'] ?? 'belum'; ?>
 
-        <?php
-        $dp_status = $booking['pembayaran_dp_status'] ?? 'belum';
+    <?php if ($dp_status === 'dibayar'): ?>
+      <span class="status-badge" style="background-color: #D4EDDA; color: #155724;">Sudah Dibayar</span><br>
+      <button class="btn btn-sm btn-warning mt-2 toggle-detail">Lihat Detail</button>
+      <div class="detail-box text-sm" style="display:none;">
+        <strong>Metode:</strong> <?= $booking['dp_metode_pembayaran'] ?? '-' ?><br>
+        <strong>Jumlah:</strong> Rp <?= number_format($booking['dp_jumlah'] ?? 0, 0, ',', '.') ?><br>
+        <strong>Order ID:</strong> <?= $booking['dp_order_id'] ?? '-' ?>
+      </div>
 
-        if ($dp_status === 'dibayar'): ?>
-            <span class="status-badge" style="background-color: #D4EDDA; color: #155724;">Sudah Dibayar</span>
-            <br>
-            <a href="../uploads/<?= htmlspecialchars($booking['bukti_pembayaran'] ?? '') ?>" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
-                <i class="fas fa-file-image me-1"></i>Lihat Bukti
-            </a>
+    <?php elseif ($dp_status === 'pending'): ?>
+      <span class="status-badge" style="background-color: #FFEFD5; color: #856404;">Menunggu Pembayaran</span><br>
+      <button class="btn btn-sm btn-warning mt-2 toggle-detail">Lihat Detail</button>
+      <div class="detail-box text-sm" style="display:none;">
+        <strong>Metode:</strong> <?= $booking['dp_metode_pembayaran'] ?? '-' ?><br>
+        <strong>Jumlah:</strong> Rp <?= number_format($booking['dp_jumlah'] ?? 0, 0, ',', '.') ?><br>
+        <strong>Order ID:</strong> <?= $booking['dp_order_id'] ?? '-' ?>
+      </div>
 
+    <?php elseif ($dp_status === 'ditolak'): ?>
+      <span class="status-badge" style="background-color: #F8D7DA; color: #721C24;">Pembayaran Gagal / Ditolak</span><br>
+      <a href="midtransPembayaran.php?id=<?= $booking['id_booking'] ?>" class="btn btn-sm btn-danger mt-2">
+        <i class="fas fa-redo me-1"></i> Bayar Ulang DP
+      </a>
 
-        <?php elseif ($dp_status === 'pending'): ?>
-            <span class="status-badge" style="background-color: #FFEFD5; color: #856404;">Menunggu Verifikasi</span>
-            <br>
-            <a href="../uploads/<?= htmlspecialchars($booking['bukti_pembayaran'] ?? '') ?>" target="_blank" class="btn btn-sm btn-outline-secondary mt-2">
-                <i class="fas fa-clock me-1"></i>Lihat Bukti
-            </a>
-
-        <?php elseif ($dp_status === 'ditolak'): ?>
-            <span class="status-badge" style="background-color: #F8D7DA; color: #721C24;">Pembayaran Ditolak</span>
-            <br>
-            <a href="pembayaran.php?id=<?= $booking['id_booking'] ?>" class="btn btn-sm btn-warning mt-2">
-                <i class="fas fa-redo me-1"></i>Upload Ulang Bukti
-            </a>
-
-        <?php else: ?>
-            <span class="status-badge" style="background-color: #FFF3CD; color: #856404;">Belum Bayar DP</span>
-            <br>
-            <a href="midtransPembayaran.php?id=<?= $booking['id_booking'] ?>" class="btn btn-sm btn-primary mt-2">
-                <i class="fas fa-wallet me-1"></i>Bayar DP Sekarang
-            </a>
-        <?php endif; ?>
-    </div>
+    <?php else: ?>
+      <span class="status-badge" style="background-color: #FFF3CD; color: #856404;">Belum Bayar DP</span><br>
+      <a href="midtransPembayaran.php?id=<?= $booking['id_booking'] ?>" class="btn btn-sm btn-primary mt-2">
+        <i class="fas fa-wallet me-1"></i> Bayar DP Sekarang
+      </a>
+    <?php endif; ?>
+  </div>
 </div>
+
+
 <div class="booking-detail">
-    <div class="booking-icon">
-        <i class="fas fa-money-bill-wave"></i>
-    </div>
-    <div>
-        <strong>Status Pelunasan:</strong>
-        
-        <?php
-        $lunas_status = $booking['pembayaran_lunas_status'] ?? 'belum';
-        
-        if ($lunas_status === 'dibayar'): ?>
-            <span class="status-badge" style="background-color: #D4EDDA; color: #155724;">
-                Lunas (Terverifikasi)
-            </span>
-            <br>
-            <a href="../uploads/<?= htmlspecialchars($booking['bukti_pembayaran_lunas'] ?? '') ?>" 
-               target="_blank" 
-               class="btn btn-sm btn-outline-success mt-2">
-                <i class="fas fa-file-invoice-dollar me-1"></i>Lihat Bukti Lunas
-            </a>
-            
-        <?php elseif ($lunas_status === 'pending'): ?>
-            <span class="status-badge" style="background-color: #FFEFD5; color: #856404;">
-                Menunggu Verifikasi Pelunasan
-            </span>
-            <br>
-            <a href="../uploads/<?= htmlspecialchars($booking['bukti_pembayaran_lunas'] ?? '') ?>" 
-               target="_blank" 
-               class="btn btn-sm btn-outline-warning mt-2">
-                <i class="fas fa-hourglass-half me-1"></i>Lihat Bukti Lunas
-            </a>
-            
-        <?php elseif ($lunas_status === 'ditolak'): ?>
-            <span class="status-badge" style="background-color: #F8D7DA; color: #721C24;">
-                Pelunasan Ditolak
-            </span>
-            <br>
-            <a href="pembayaranLunas.php?id=<?= $booking['id_booking'] ?>" 
-               class="btn btn-sm btn-danger mt-2">
-                <i class="fas fa-exclamation-triangle me-1"></i>Upload Ulang Pelunasan
-            </a>
-            
-        <?php elseif ($booking['pembayaran_dp_status'] === 'dibayar' && $lunas_status === 'belum'): ?>
-            <span class="status-badge" style="background-color: #E2E3E5; color: #383D41;">
-                Belum Lunas
-            </span>
-            <br>
-            <a href="midtransLunas.php?id=<?= $booking['id_booking'] ?>" 
-               class="btn btn-sm btn-success mt-2">
-                <i class="fas fa-check-circle me-1"></i>Bayar Lunas Sekarang
-            </a>
-            
-        <?php else: ?>
-            <span class="status-badge" style="background-color: #E2E3E5; color: #383D41;">
-                Belum Lunas
-            </span>
-        <?php endif; ?>
-    </div>
+  <div class="booking-icon">
+    <i class="fas fa-money-bill-wave"></i>
+  </div>
+  <div>
+    <strong>Status Pelunasan:</strong>
+    <?php $lunas_status = $booking['pembayaran_lunas_status'] ?? 'belum'; ?>
+
+    <?php if ($lunas_status === 'dibayar'): ?>
+      <span class="status-badge" style="background-color: #D4EDDA; color: #155724;">Lunas (Terverifikasi)</span><br>
+      <button class="btn btn-sm btn-info mt-2 toggle-detail">Lihat Detail</button>
+      <div class="detail-box text-sm" style="display:none;">
+        <strong>Metode:</strong> <?= $booking['lunas_metode_pembayaran'] ?? '-' ?><br>
+        <strong>Jumlah:</strong> Rp <?= number_format($booking['lunas_jumlah'] ?? 0, 0, ',', '.') ?><br>
+        <strong>Order ID:</strong> <?= $booking['lunas_order_id'] ?? '-' ?>
+      </div>
+
+    <?php elseif ($lunas_status === 'pending'): ?>
+      <span class="status-badge" style="background-color: #FFEFD5; color: #856404;">Menunggu Pembayaran</span><br>
+      <button class="btn btn-sm btn-info mt-2 toggle-detail">Lihat Detail</button>
+      <div class="detail-box text-sm" style="display:none;">
+        <strong>Metode:</strong> <?= $booking['lunas_metode_pembayaran'] ?? '-' ?><br>
+        <strong>Jumlah:</strong> Rp <?= number_format($booking['lunas_jumlah'] ?? 0, 0, ',', '.') ?><br>
+        <strong>Order ID:</strong> <?= $booking['lunas_order_id'] ?? '-' ?>
+      </div>
+
+    <?php elseif ($lunas_status === 'ditolak'): ?>
+      <span class="status-badge" style="background-color: #F8D7DA; color: #721C24;">Pelunasan Gagal / Ditolak</span><br>
+      <a href="midtransLunas.php?id=<?= $booking['id_booking'] ?>" class="btn btn-sm btn-danger mt-2">
+        <i class="fas fa-redo me-1"></i> Bayar Ulang Pelunasan
+      </a>
+
+    <?php elseif ($booking['pembayaran_dp_status'] === 'dibayar' && $lunas_status === 'belum'): ?>
+      <span class="status-badge" style="background-color: #E2E3E5; color: #383D41;">Belum Lunas</span><br>
+      <a href="midtransLunas.php?id=<?= $booking['id_booking'] ?>" class="btn btn-sm btn-success mt-2">
+        <i class="fas fa-check-circle me-1"></i> Bayar Lunas Sekarang
+      </a>
+
+    <?php else: ?>
+      <span class="status-badge" style="background-color: #E2E3E5; color: #383D41;">Belum Lunas</span>
+    <?php endif; ?>
+  </div>
 </div>
+
 
                     </div>
                 </div>
@@ -616,6 +621,35 @@ unset($booking);
         </div>
     </footer>
 
+    <!-- <script>
+    document.querySelectorAll('.toggle-detail').forEach(button => {
+        button.addEventListener('click', function () {
+        const detailBox = this.nextElementSibling;
+        if (detailBox.style.display === 'none') {
+            detailBox.style.display = 'block';
+            this.innerText = 'Sembunyikan Detail';
+        } else {
+            detailBox.style.display = 'none';
+            this.innerText = 'Lihat Detail';
+        }
+        });
+    });
+    </script> -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const toggleButtons = document.querySelectorAll('.toggle-detail');
+        toggleButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const detailBox = this.nextElementSibling;
+            if (detailBox.style.display === 'none' || detailBox.style.display === '') {
+            detailBox.style.display = 'block';
+            } else {
+            detailBox.style.display = 'none';
+            }
+        });
+        });
+    });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
 </body>

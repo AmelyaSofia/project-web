@@ -9,6 +9,8 @@ require_once '../config/dbconnect.php';
 \Midtrans\Config::$isProduction = false;
 
 $raw = file_get_contents("php://input");
+file_put_contents(__DIR__ . '/../log_webhook.txt', date('Y-m-d H:i:s') . " - Webhook triggered\n", FILE_APPEND);
+file_put_contents(__DIR__ . '/../log_webhook_data.json', $raw);
 $data = json_decode($raw);
 
 if (!$data || !isset($data->transaction_status)) {
@@ -26,7 +28,7 @@ $jenis = strtolower($parts[0] ?? 'dp');
 $id_booking = intval($parts[1] ?? 0);
 
 if (!in_array($jenis, ['dp', 'lunas'])) {
-    $jenis = 'dp'; // fallback
+    $jenis = 'dp'; 
 }
 
 if ($id_booking && in_array($transaction_status, ['settlement', 'capture'])) {
@@ -50,8 +52,8 @@ if ($id_booking && in_array($transaction_status, ['settlement', 'capture'])) {
         $status = 'dibayar';
         $jumlah = floatval($gross_amount);
 
-        $insert = $conn->prepare("INSERT INTO pembayaran (id_booking, jenis, jumlah, metode_pembayaran, status_pembayaran) VALUES (?, ?, ?, ?, ?)");
-        $insert->bind_param("isdss", $id_booking, $jenis, $jumlah, $metode, $status);
+        $insert = $conn->prepare("INSERT INTO pembayaran (id_booking, jenis, jumlah, metode_pembayaran, status_pembayaran, order_id) VALUES (?, ?, ?, ?, ?, ?)");
+        $insert->bind_param("isdsss", $id_booking, $jenis, $jumlah, $metode, $status, $order_id);
         $insert->execute();
     }
 }

@@ -50,22 +50,22 @@ class ModelPembayaran {
         return true;
     }
 
-    public function cekDPTelahDibayar($id_booking) {
-        $sql = "SELECT * FROM pembayaran 
-                WHERE id_booking = ? AND jenis = 'dp' 
-                ORDER BY id_pembayaran DESC LIMIT 1";
+    // public function cekDPTelahDibayar($id_booking) {
+    //     $sql = "SELECT * FROM pembayaran 
+    //             WHERE id_booking = ? AND jenis = 'dp' 
+    //             ORDER BY id_pembayaran DESC LIMIT 1";
 
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("i", $id_booking);
-        $stmt->execute();
-        $result = $stmt->get_result();
+    //     $stmt = $this->conn->prepare($sql);
+    //     $stmt->bind_param("i", $id_booking);
+    //     $stmt->execute();
+    //     $result = $stmt->get_result();
 
-        if ($result && $result->num_rows > 0) {
-            return $result->fetch_assoc(); 
-        }
+    //     if ($result && $result->num_rows > 0) {
+    //         return $result->fetch_assoc(); 
+    //     }
 
-        return null; 
-    }
+    //     return null; 
+    // }
 
     public function getPembayaranById($id_pembayaran) {
         $stmt = $this->conn->prepare("SELECT * FROM pembayaran WHERE id_pembayaran = ?");
@@ -82,14 +82,42 @@ class ModelPembayaran {
         return $stmt->get_result()->fetch_assoc();
     }
 
-    public function cekPembayaranLunas($id_booking) {
-        $sql = "SELECT * FROM pembayaran 
-                WHERE id_booking = ? AND jenis = 'lunas'";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("i", $id_booking);
-        $stmt->execute();
-        return $stmt->get_result()->fetch_assoc();
-    }
+    // public function cekPembayaranLunas($id_booking) {
+    //     $sql = "SELECT * FROM pembayaran 
+    //             WHERE id_booking = ? AND jenis = 'lunas'";
+    //     $stmt = $this->conn->prepare($sql);
+    //     $stmt->bind_param("i", $id_booking);
+    //     $stmt->execute();
+    //     return $stmt->get_result()->fetch_assoc();
+    // }
+
+public function cekDPTelahDibayar($id_booking) {
+    $stmt = $this->conn->prepare("
+        SELECT jumlah, metode_pembayaran, status_pembayaran, order_id 
+        FROM pembayaran 
+        WHERE id_booking = ? AND jenis = 'dp' 
+        ORDER BY id_pembayaran DESC LIMIT 1
+    ");
+    $stmt->bind_param("i", $id_booking);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_assoc();
+}
+
+
+public function cekPembayaranLunas($id_booking) {
+    $stmt = $this->conn->prepare("
+        SELECT jumlah, metode_pembayaran, status_pembayaran, order_id 
+        FROM pembayaran 
+        WHERE id_booking = ? AND jenis = 'lunas' 
+        ORDER BY id_pembayaran DESC LIMIT 1
+    ");
+    $stmt->bind_param("i", $id_booking);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_assoc();
+}
+
 
     public function getAllPembayaran($page = 1, $start_date = null, $end_date = null) {
         $start = ($page > 1) ? ($page * $this->limit) - $this->limit : 0;
@@ -128,8 +156,7 @@ class ModelPembayaran {
         $total_row = $count_stmt->get_result()->fetch_assoc();
         $total_data = $total_row['total'];
         $total_pages = ceil($total_data / $this->limit);
-        
-        // Main query
+
         $query = $base_query;
         if (!empty($where_conditions)) {
             $query .= " WHERE " . implode(' AND ', $where_conditions);

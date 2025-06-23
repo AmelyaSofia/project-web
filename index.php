@@ -42,6 +42,12 @@ switch ($modul) {
         $controllerBooking = new ControllerBooking();
         $controllerBooking->handleRequest($fitur);
         break;
+    
+    case 'midtrans': 
+        include './controller/midtransController.php';
+        $controllerMidtrans = new ControllerMidtrans($conn);
+        $controllerMidtrans->handleRequest($fitur);
+        break;
 
     case 'pembayaran': 
         include './controller/pembayaranController.php';

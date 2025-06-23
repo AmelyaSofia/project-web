@@ -1,5 +1,7 @@
 <?php
-require_once '../config/dbconnect.php';
+require_once __DIR__ . '/../config/dbconnect.php';
+
+global $conn;
 
 $start_date = $_GET['start_date'] ?? '';
 $end_date = $_GET['end_date'] ?? '';
