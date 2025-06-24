@@ -39,11 +39,13 @@ foreach ($riwayatBookings as &$booking) {
         $booking['dp_order_id'] = $pembayaran['order_id'] ?? '-';
         $booking['dp_jumlah'] = $pembayaran['jumlah'] ?? 0;
         $booking['dp_metode_pembayaran'] = $pembayaran['metode_pembayaran'] ?? '-';
+        $booking['dp_timestamp'] = $pembayaran['timestamp'] ?? $booking['tanggal'] . ' ' . $booking['waktu'];
     } else {
         $booking['pembayaran_dp_status'] = 'belum';
         $booking['dp_order_id'] = '-';
         $booking['dp_jumlah'] = 0;
         $booking['dp_metode_pembayaran'] = '-';
+        $booking['dp_timestamp'] = $booking['tanggal'] . ' ' . $booking['waktu'];
     }
 
     $pembayaranLunas = $pembayaranModel->cekPembayaranLunas($booking['id_booking']);
@@ -52,11 +54,13 @@ foreach ($riwayatBookings as &$booking) {
         $booking['lunas_order_id'] = $pembayaranLunas['order_id'] ?? '-';
         $booking['lunas_jumlah'] = $pembayaranLunas['jumlah'] ?? 0;
         $booking['lunas_metode_pembayaran'] = $pembayaranLunas['metode_pembayaran'] ?? '-';
+        $booking['lunas_timestamp'] = $pembayaranLunas['timestamp'] ?? $booking['tanggal'] . ' ' . $booking['waktu'];
     } else {
         $booking['pembayaran_lunas_status'] = 'belum';
         $booking['lunas_order_id'] = '-';
         $booking['lunas_jumlah'] = 0;
         $booking['lunas_metode_pembayaran'] = '-';
+        $booking['lunas_timestamp'] = $booking['tanggal'] . ' ' . $booking['waktu'];
     }
 }
 unset($booking);
@@ -256,6 +260,91 @@ unset($booking);
             margin-bottom: 20px;
         }
         
+        /* Modal Styles */
+        .modal-receipt {
+            display: none;
+            position: fixed;
+            z-index: 1050;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            position: relative;
+            animation: modalFadeIn 0.3s;
+        }
+        
+        @keyframes modalFadeIn {
+            from {opacity: 0; transform: translateY(-20px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        
+        .receipt-container {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .receipt-header {
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #ddd;
+            display: flex;
+            align-items: center;
+            font-size: 1.2rem;
+        }
+        
+        .receipt-header i {
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .receipt-row:last-child {
+            border-bottom: none;
+        }
+        
+        .receipt-label {
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+        
+        .receipt-value {
+            color: #555;
+            text-align: right;
+            font-weight: 500;
+        }
+        
         /* Footer Styles */
         footer {
             background-color: var(--dark-color);
@@ -345,15 +434,11 @@ unset($booking);
             .page-title {
                 font-size: 1.8rem;
             }
-        }
-
-          .detail-box {
-            background: #fefefe;
-            border-left: 4px solid #2A9D8F;
-            padding: 10px 12px;
-            border-radius: 8px;
-            margin-top: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            
+            .modal-content {
+                margin: 10% auto;
+                width: 95%;
+            }
         }
     </style>
 </head>
@@ -401,177 +486,170 @@ unset($booking);
             <?php endif; ?>
 
             <?php if (!empty($riwayatBookings)): ?>
-    <div class="row">
-        <?php foreach ($riwayatBookings as $booking): ?>
-            <div class="col-md-6 col-lg-4">
-                <div class="card history-card">
-                    <div class="card-header">
-                        <strong>Layanan:</strong>
-                        <ul class="mb-0 ps-3">
-                            <?php foreach ($booking['layanan_list'] as $l): ?>
-                                <li><?= htmlspecialchars($l['nama_layanan']) ?> - Rp <?= number_format($l['harga'], 0, ',', '.') ?></li>
-                            <?php endforeach; ?>
-                        </ul>
-                        <div class="float-end mt-2">
-                            <span class="badge bg-success">Total: Rp <?= number_format($booking['total_harga'], 0, ',', '.') ?></span>
+                <div class="row">
+                    <?php foreach ($riwayatBookings as $booking): ?>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card history-card">
+                                <div class="card-header">
+                                    <strong>Layanan:</strong>
+                                    <ul class="mb-0 ps-3">
+                                        <?php foreach ($booking['layanan_list'] as $l): ?>
+                                            <li><?= htmlspecialchars($l['nama_layanan']) ?> - Rp <?= number_format($l['harga'], 0, ',', '.') ?></li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                    <div class="float-end mt-2">
+                                        <span class="badge bg-success">Total: Rp <?= number_format($booking['total_harga'], 0, ',', '.') ?></span>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="booking-detail">
+                                        <div class="booking-icon">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <div>
+                                            <strong>Stylist:</strong> <?= htmlspecialchars($booking['nama_stylist']) ?>
+                                        </div>
+                                    </div>
+
+                                    <div class="booking-detail">
+                                        <div class="booking-icon">
+                                            <i class="far fa-calendar-alt"></i>
+                                        </div>
+                                        <div>
+                                            <strong>Tanggal:</strong> <?= date('d M Y', strtotime($booking['tanggal'])) ?>
+                                        </div>
+                                    </div>
+
+                                    <div class="booking-detail">
+                                        <div class="booking-icon">
+                                            <i class="far fa-clock"></i>
+                                        </div>
+                                        <div>
+                                            <strong>Waktu:</strong> <?= htmlspecialchars($booking['waktu']) ?>
+                                            <span class="text-muted">(<?= $booking['total_durasi'] ?> menit)</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="booking-detail">
+                                        <div class="booking-icon">
+                                            <i class="fas fa-info-circle"></i>
+                                        </div>
+                                        <div>
+                                            <strong>Status:</strong> 
+                                            <span class="status-badge 
+                                                <?= $booking['status'] == 'menunggu' ? 'status-menunggu' : 
+                                                   ($booking['status'] == 'diterima' ? 'status-diterima' : 
+                                                   ($booking['status'] == 'selesai' ? 'status-selesai' : 'status-ditolak')) ?>">
+                                                <?= ucfirst(htmlspecialchars($booking['status'])) ?>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="booking-detail">
+                                        <div class="booking-icon">
+                                            <i class="fas fa-comment"></i>
+                                        </div>
+                                        <div>
+                                            <strong>Catatan:</strong> <?= htmlspecialchars($booking['catatan'] ?: '-') ?>
+                                        </div>
+                                    </div>
+
+                                    <div class="booking-detail">
+                                        <div class="booking-icon">
+                                            <i class="fas fa-money-check-alt"></i>
+                                        </div>
+                                        <div>
+                                            <strong>Status DP:</strong>
+                                            <?php $dp_status = $booking['pembayaran_dp_status'] ?? 'belum'; ?>
+
+                                            <?php if ($dp_status === 'dibayar'): ?>
+                                                <span class="status-badge" style="background-color: #D4EDDA; color: #155724;">Sudah Dibayar</span><br>
+                                                <button class="btn btn-sm btn-warning mt-2 show-receipt" 
+                                                        data-type="dp" 
+                                                        data-booking-id="<?= $booking['id_booking'] ?>">
+                                                    <i class="fas fa-receipt me-1"></i> Lihat Detail
+                                                </button>
+                                            <?php elseif ($dp_status === 'pending'): ?>
+                                                <span class="status-badge" style="background-color: #FFEFD5; color: #856404;">Menunggu Pembayaran</span><br>
+                                                <button class="btn btn-sm btn-warning mt-2 show-receipt" 
+                                                        data-type="dp" 
+                                                        data-booking-id="<?= $booking['id_booking'] ?>">
+                                                    <i class="fas fa-receipt me-1"></i> Lihat Detail
+                                                </button>
+                                            <?php elseif ($dp_status === 'ditolak'): ?>
+                                                <span class="status-badge" style="background-color: #F8D7DA; color: #721C24;">Pembayaran Gagal / Ditolak</span><br>
+                                                <a href="midtransPembayaran.php?id=<?= $booking['id_booking'] ?>" class="btn btn-sm btn-danger mt-2">
+                                                    <i class="fas fa-redo me-1"></i> Bayar Ulang DP
+                                                </a>
+                                            <?php else: ?>
+                                                <span class="status-badge" style="background-color: #FFF3CD; color: #856404;">Belum Bayar DP</span><br>
+                                                <a href="midtransPembayaran.php?id=<?= $booking['id_booking'] ?>" class="btn btn-sm btn-primary mt-2">
+                                                    <i class="fas fa-wallet me-1"></i> Bayar DP Sekarang
+                                                </a>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+
+                                    <div class="booking-detail">
+                                        <div class="booking-icon">
+                                            <i class="fas fa-money-bill-wave"></i>
+                                        </div>
+                                        <div>
+                                            <strong>Status Pelunasan:</strong>
+                                            <?php $lunas_status = $booking['pembayaran_lunas_status'] ?? 'belum'; ?>
+
+                                            <?php if ($lunas_status === 'dibayar'): ?>
+                                                <span class="status-badge" style="background-color: #D4EDDA; color: #155724;">Lunas (Terverifikasi)</span><br>
+                                                <button class="btn btn-sm btn-info mt-2 show-receipt" 
+                                                        data-type="lunas" 
+                                                        data-booking-id="<?= $booking['id_booking'] ?>">
+                                                    <i class="fas fa-receipt me-1"></i> Lihat Detail
+                                                </button>
+                                            <?php elseif ($lunas_status === 'pending'): ?>
+                                                <span class="status-badge" style="background-color: #FFEFD5; color: #856404;">Menunggu Pembayaran</span><br>
+                                                <button class="btn btn-sm btn-info mt-2 show-receipt" 
+                                                        data-type="lunas" 
+                                                        data-booking-id="<?= $booking['id_booking'] ?>">
+                                                    <i class="fas fa-receipt me-1"></i> Lihat Detail
+                                                </button>
+                                            <?php elseif ($lunas_status === 'ditolak'): ?>
+                                                <span class="status-badge" style="background-color: #F8D7DA; color: #721C24;">Pelunasan Gagal / Ditolak</span><br>
+                                                <a href="midtransLunas.php?id=<?= $booking['id_booking'] ?>" class="btn btn-sm btn-danger mt-2">
+                                                    <i class="fas fa-redo me-1"></i> Bayar Ulang Pelunasan
+                                                </a>
+                                            <?php elseif ($booking['pembayaran_dp_status'] === 'dibayar' && $lunas_status === 'belum'): ?>
+                                                <span class="status-badge" style="background-color: #E2E3E5; color: #383D41;">Belum Lunas</span><br>
+                                                <a href="midtransLunas.php?id=<?= $booking['id_booking'] ?>" class="btn btn-sm btn-success mt-2">
+                                                    <i class="fas fa-check-circle me-1"></i> Bayar Lunas Sekarang
+                                                </a>
+                                            <?php else: ?>
+                                                <span class="status-badge" style="background-color: #E2E3E5; color: #383D41;">Belum Lunas</span>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="booking-detail">
-                            <div class="booking-icon">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div>
-                                <strong>Stylist:</strong> <?= htmlspecialchars($booking['nama_stylist']) ?>
-                            </div>
-                        </div>
-
-                        <div class="booking-detail">
-                            <div class="booking-icon">
-                                <i class="far fa-calendar-alt"></i>
-                            </div>
-                            <div>
-                                <strong>Tanggal:</strong> <?= date('d M Y', strtotime($booking['tanggal'])) ?>
-                            </div>
-                        </div>
-
-                        <div class="booking-detail">
-                            <div class="booking-icon">
-                                <i class="far fa-clock"></i>
-                            </div>
-                            <div>
-                                <strong>Waktu:</strong> <?= htmlspecialchars($booking['waktu']) ?>
-                                <span class="text-muted">(<?= $booking['total_durasi'] ?> menit)</span>
-                            </div>
-                        </div>
-
-                        <div class="booking-detail">
-                            <div class="booking-icon">
-                                <i class="fas fa-info-circle"></i>
-                            </div>
-                            <div>
-                                <strong>Status:</strong> 
-                                <span class="status-badge 
-                                    <?= $booking['status'] == 'menunggu' ? 'status-menunggu' : 
-                                       ($booking['status'] == 'diterima' ? 'status-diterima' : 
-                                       ($booking['status'] == 'selesai' ? 'status-selesai' : 'status-ditolak')) ?>">
-                                    <?= ucfirst(htmlspecialchars($booking['status'])) ?>
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="booking-detail">
-                            <div class="booking-icon">
-                                <i class="fas fa-comment"></i>
-                            </div>
-                            <div>
-                                <strong>Catatan:</strong> <?= htmlspecialchars($booking['catatan'] ?: '-') ?>
-                            </div>
-                        </div>
-
-
-<div class="booking-detail">
-  <div class="booking-icon">
-    <i class="fas fa-money-check-alt"></i>
-  </div>
-  <div>
-    <strong>Status DP:</strong>
-    <?php $dp_status = $booking['pembayaran_dp_status'] ?? 'belum'; ?>
-
-    <?php if ($dp_status === 'dibayar'): ?>
-      <span class="status-badge" style="background-color: #D4EDDA; color: #155724;">Sudah Dibayar</span><br>
-      <button class="btn btn-sm btn-warning mt-2 toggle-detail">Lihat Detail</button>
-      <div class="detail-box text-sm" style="display:none;">
-        <strong>Metode:</strong> <?= $booking['dp_metode_pembayaran'] ?? '-' ?><br>
-        <strong>Jumlah:</strong> Rp <?= number_format($booking['dp_jumlah'] ?? 0, 0, ',', '.') ?><br>
-        <strong>Order ID:</strong> <?= $booking['dp_order_id'] ?? '-' ?>
-      </div>
-
-    <?php elseif ($dp_status === 'pending'): ?>
-      <span class="status-badge" style="background-color: #FFEFD5; color: #856404;">Menunggu Pembayaran</span><br>
-      <button class="btn btn-sm btn-warning mt-2 toggle-detail">Lihat Detail</button>
-      <div class="detail-box text-sm" style="display:none;">
-        <strong>Metode:</strong> <?= $booking['dp_metode_pembayaran'] ?? '-' ?><br>
-        <strong>Jumlah:</strong> Rp <?= number_format($booking['dp_jumlah'] ?? 0, 0, ',', '.') ?><br>
-        <strong>Order ID:</strong> <?= $booking['dp_order_id'] ?? '-' ?>
-      </div>
-
-    <?php elseif ($dp_status === 'ditolak'): ?>
-      <span class="status-badge" style="background-color: #F8D7DA; color: #721C24;">Pembayaran Gagal / Ditolak</span><br>
-      <a href="midtransPembayaran.php?id=<?= $booking['id_booking'] ?>" class="btn btn-sm btn-danger mt-2">
-        <i class="fas fa-redo me-1"></i> Bayar Ulang DP
-      </a>
-
-    <?php else: ?>
-      <span class="status-badge" style="background-color: #FFF3CD; color: #856404;">Belum Bayar DP</span><br>
-      <a href="midtransPembayaran.php?id=<?= $booking['id_booking'] ?>" class="btn btn-sm btn-primary mt-2">
-        <i class="fas fa-wallet me-1"></i> Bayar DP Sekarang
-      </a>
-    <?php endif; ?>
-  </div>
-</div>
-
-
-<div class="booking-detail">
-  <div class="booking-icon">
-    <i class="fas fa-money-bill-wave"></i>
-  </div>
-  <div>
-    <strong>Status Pelunasan:</strong>
-    <?php $lunas_status = $booking['pembayaran_lunas_status'] ?? 'belum'; ?>
-
-    <?php if ($lunas_status === 'dibayar'): ?>
-      <span class="status-badge" style="background-color: #D4EDDA; color: #155724;">Lunas (Terverifikasi)</span><br>
-      <button class="btn btn-sm btn-info mt-2 toggle-detail">Lihat Detail</button>
-      <div class="detail-box text-sm" style="display:none;">
-        <strong>Metode:</strong> <?= $booking['lunas_metode_pembayaran'] ?? '-' ?><br>
-        <strong>Jumlah:</strong> Rp <?= number_format($booking['lunas_jumlah'] ?? 0, 0, ',', '.') ?><br>
-        <strong>Order ID:</strong> <?= $booking['lunas_order_id'] ?? '-' ?>
-      </div>
-
-    <?php elseif ($lunas_status === 'pending'): ?>
-      <span class="status-badge" style="background-color: #FFEFD5; color: #856404;">Menunggu Pembayaran</span><br>
-      <button class="btn btn-sm btn-info mt-2 toggle-detail">Lihat Detail</button>
-      <div class="detail-box text-sm" style="display:none;">
-        <strong>Metode:</strong> <?= $booking['lunas_metode_pembayaran'] ?? '-' ?><br>
-        <strong>Jumlah:</strong> Rp <?= number_format($booking['lunas_jumlah'] ?? 0, 0, ',', '.') ?><br>
-        <strong>Order ID:</strong> <?= $booking['lunas_order_id'] ?? '-' ?>
-      </div>
-
-    <?php elseif ($lunas_status === 'ditolak'): ?>
-      <span class="status-badge" style="background-color: #F8D7DA; color: #721C24;">Pelunasan Gagal / Ditolak</span><br>
-      <a href="midtransLunas.php?id=<?= $booking['id_booking'] ?>" class="btn btn-sm btn-danger mt-2">
-        <i class="fas fa-redo me-1"></i> Bayar Ulang Pelunasan
-      </a>
-
-    <?php elseif ($booking['pembayaran_dp_status'] === 'dibayar' && $lunas_status === 'belum'): ?>
-      <span class="status-badge" style="background-color: #E2E3E5; color: #383D41;">Belum Lunas</span><br>
-      <a href="midtransLunas.php?id=<?= $booking['id_booking'] ?>" class="btn btn-sm btn-success mt-2">
-        <i class="fas fa-check-circle me-1"></i> Bayar Lunas Sekarang
-      </a>
-
-    <?php else: ?>
-      <span class="status-badge" style="background-color: #E2E3E5; color: #383D41;">Belum Lunas</span>
-    <?php endif; ?>
-  </div>
-</div>
-
-
-                    </div>
+                    <?php endforeach; ?>
                 </div>
-            </div>
-        <?php endforeach; ?>
-    </div>
-<?php else: ?>
-    <div class="no-history">
-        <i class="fas fa-calendar-times"></i>
-        <h3>Belum Ada Riwayat Booking</h3>
-        <p>Anda belum memiliki riwayat booking. Silakan booking layanan kami terlebih dahulu.</p>
-        <a href="clientDashboard.php#services" class="btn btn-primary">Lihat Layanan</a>
-    </div>
-<?php endif; ?>
+            <?php else: ?>
+                <div class="no-history">
+                    <i class="fas fa-calendar-times"></i>
+                    <h3>Belum Ada Riwayat Booking</h3>
+                    <p>Anda belum memiliki riwayat booking. Silakan booking layanan kami terlebih dahulu.</p>
+                    <a href="clientDashboard.php#services" class="btn btn-primary">Lihat Layanan</a>
+                </div>
+            <?php endif; ?>
         </div>
     </section>
+
+    <!-- Modal Receipt -->
+    <div id="receiptModal" class="modal-receipt">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <div id="receiptContent"></div>
+        </div>
+    </div>
 
     <footer id="contact">
         <div class="container">
@@ -621,35 +699,100 @@ unset($booking);
         </div>
     </footer>
 
-    <!-- <script>
-    document.querySelectorAll('.toggle-detail').forEach(button => {
-        button.addEventListener('click', function () {
-        const detailBox = this.nextElementSibling;
-        if (detailBox.style.display === 'none') {
-            detailBox.style.display = 'block';
-            this.innerText = 'Sembunyikan Detail';
-        } else {
-            detailBox.style.display = 'none';
-            this.innerText = 'Lihat Detail';
-        }
-        });
-    });
-    </script> -->
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const toggleButtons = document.querySelectorAll('.toggle-detail');
-        toggleButtons.forEach(button => {
-        button.addEventListener('click', function () {
-            const detailBox = this.nextElementSibling;
-            if (detailBox.style.display === 'none' || detailBox.style.display === '') {
-            detailBox.style.display = 'block';
-            } else {
-            detailBox.style.display = 'none';
+    document.addEventListener('DOMContentLoaded', function() {
+        // Modal functionality
+        const modal = document.getElementById('receiptModal');
+        const closeBtn = document.querySelector('.close-modal');
+        
+        // Event untuk tombol lihat detail
+        document.querySelectorAll('.show-receipt').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const type = this.getAttribute('data-type');
+                const bookingId = this.getAttribute('data-booking-id');
+                
+                // Cari data booking yang sesuai
+                const bookingData = <?= json_encode($riwayatBookings) ?>.find(b => b.id_booking == bookingId);
+                
+                if (bookingData) {
+                    // Generate receipt content berdasarkan type (dp/lunas)
+                    let receiptHtml = generateReceiptHtml(type, bookingData);
+                    document.getElementById('receiptContent').innerHTML = receiptHtml;
+                    
+                    // Tampilkan modal
+                    modal.style.display = 'block';
+                }
+            });
+        });
+        
+        // Tutup modal
+        closeBtn.addEventListener('click', function() {
+            modal.style.display = 'none';
+        });
+        
+        // Tutup modal jika klik di luar konten
+        window.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.style.display = 'none';
             }
         });
-        });
+        
+        // Fungsi generate receipt HTML
+        function generateReceiptHtml(type, booking) {
+            const isDP = (type === 'dp');
+            const prefix = isDP ? 'dp_' : 'lunas_';
+            const title = isDP ? 'Detail Pembayaran DP' : 'Detail Pelunasan';
+            const statusClass = booking[prefix + 'status_pembayaran'] === 'dibayar' ? 'bg-success' : 'bg-warning text-dark';
+            const statusText = booking[prefix + 'status_pembayaran'] === 'dibayar' ? 'Berhasil' : 'Pending';
+            
+            // Format timestamp
+            let timestamp = booking[prefix + 'timestamp'] || booking['tanggal'] + ' ' + booking['waktu'];
+            let formattedDate = '';
+            try {
+                const dateObj = new Date(timestamp);
+                formattedDate = dateObj.toLocaleDateString('id-ID', { 
+                    day: '2-digit', 
+                    month: 'short', 
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (e) {
+                formattedDate = timestamp;
+            }
+            
+            return `
+                <div class="receipt-container">
+                    <div class="receipt-header">
+                        <i class="fas fa-receipt"></i> ${title}
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Tanggal & Waktu:</span>
+                        <span class="receipt-value">${formattedDate}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Order ID:</span>
+                        <span class="receipt-value">${booking[prefix + 'order_id'] || '-'}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Metode Pembayaran:</span>
+                        <span class="receipt-value">${booking[prefix + 'metode_pembayaran'] || '-'}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Jumlah Bayar:</span>
+                        <span class="receipt-value">Rp ${new Intl.NumberFormat('id-ID').format(booking[prefix + 'jumlah'] || 0)}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Email Pelanggan:</span>
+                        <span class="receipt-value"><?= $clientData['email'] ?? '-' ?></span>
+                    </div>
+                   
+                </div>
+            `;
+        }
     });
     </script>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
 </body>

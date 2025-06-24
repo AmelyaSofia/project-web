@@ -39,15 +39,7 @@ $status = $_GET['status'] ?? '';
                 <label class="block text-sm font-medium mb-1">Sampai Tanggal</label>
                 <input type="date" name="end_date" value="<?= htmlspecialchars($end_date) ?>" class="p-2 border rounded">
             </div>
-            <div>
-                <label class="block text-sm font-medium mb-1">Status</label>
-                <select name="status" class="p-2 border rounded">
-                    <option value="">Semua Status</option>
-                    <option value="pending" <?= $status === 'pending' ? 'selected' : '' ?>>Pending</option>
-                    <option value="dibayar" <?= $status === 'dibayar' ? 'selected' : '' ?>>Dibayar</option>
-                    <option value="ditolak" <?= $status === 'ditolak' ? 'selected' : '' ?>>Ditolak</option>
-                </select>
-            </div>
+            
             <button type="submit" class="bg-[#967E76] text-white px-4 py-2 rounded hover:bg-[#75655e]">Filter</button>
             <?php if (!empty($start_date) || !empty($end_date) || !empty($status)): ?>
                 <a href="?modul=<?= $modul ?>&fitur=<?= $fitur ?>" class="text-[#967E76] hover:underline ml-2">Reset Filter</a>
