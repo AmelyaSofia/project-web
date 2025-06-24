@@ -77,8 +77,7 @@ $snapToken = $controller->getSnapTokenLangsung($id_booking);
             border: 1px solid rgba(163, 143, 132, 0.15);
             overflow: hidden;
         }
-        
-        /* Dekorasi daun DI DALAM CARD */
+
         .leaf-decoration {
             position: absolute;
             color: var(--nude-accent);

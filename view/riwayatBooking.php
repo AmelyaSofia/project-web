@@ -643,7 +643,6 @@ unset($booking);
         </div>
     </section>
 
-    <!-- Modal Receipt -->
     <div id="receiptModal" class="modal-receipt">
         <div class="modal-content">
             <button class="close-modal">&times;</button>
@@ -701,59 +700,52 @@ unset($booking);
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Modal functionality
         const modal = document.getElementById('receiptModal');
         const closeBtn = document.querySelector('.close-modal');
-        
-        // Event untuk tombol lihat detail
+
         document.querySelectorAll('.show-receipt').forEach(btn => {
             btn.addEventListener('click', function() {
                 const type = this.getAttribute('data-type');
                 const bookingId = this.getAttribute('data-booking-id');
-                
-                // Cari data booking yang sesuai
+
                 const bookingData = <?= json_encode($riwayatBookings) ?>.find(b => b.id_booking == bookingId);
                 
                 if (bookingData) {
-                    // Generate receipt content berdasarkan type (dp/lunas)
                     let receiptHtml = generateReceiptHtml(type, bookingData);
                     document.getElementById('receiptContent').innerHTML = receiptHtml;
-                    
-                    // Tampilkan modal
+
                     modal.style.display = 'block';
                 }
             });
         });
-        
-        // Tutup modal
+
         closeBtn.addEventListener('click', function() {
             modal.style.display = 'none';
         });
-        
-        // Tutup modal jika klik di luar konten
+
         window.addEventListener('click', function(e) {
             if (e.target === modal) {
                 modal.style.display = 'none';
             }
         });
-        
-        // Fungsi generate receipt HTML
+
         function generateReceiptHtml(type, booking) {
             const isDP = (type === 'dp');
             const prefix = isDP ? 'dp_' : 'lunas_';
             const title = isDP ? 'Detail Pembayaran DP' : 'Detail Pelunasan';
             const statusClass = booking[prefix + 'status_pembayaran'] === 'dibayar' ? 'bg-success' : 'bg-warning text-dark';
             const statusText = booking[prefix + 'status_pembayaran'] === 'dibayar' ? 'Berhasil' : 'Pending';
-            
-            // Format timestamp
+
             let timestamp = booking[prefix + 'timestamp'] || booking['tanggal'] + ' ' + booking['waktu'];
             let formattedDate = '';
             try {
                 const dateObj = new Date(timestamp);
                 formattedDate = dateObj.toLocaleDateString('id-ID', { 
-                    day: '2-digit', 
-                    month: 'short', 
+                    timeZone: 'Asia/Jakarta',
+                    hour12: false,
                     year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit'
                 });
@@ -767,7 +759,7 @@ unset($booking);
                         <i class="fas fa-receipt"></i> ${title}
                     </div>
                     <div class="receipt-row">
-                        <span class="receipt-label">Tanggal & Waktu:</span>
+                        <span class="receipt-label">Tanggal & Waktu Booking:</span>
                         <span class="receipt-value">${formattedDate}</span>
                     </div>
                     <div class="receipt-row">
@@ -786,7 +778,6 @@ unset($booking);
                         <span class="receipt-label">Email Pelanggan:</span>
                         <span class="receipt-value"><?= $clientData['email'] ?? '-' ?></span>
                     </div>
-                   
                 </div>
             `;
         }
